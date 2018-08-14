@@ -1,6 +1,6 @@
 {
   "name": "react-cimpress-users",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A simple user management component based on COAM",
   "main": "./lib/index.js",
   "scripts": {

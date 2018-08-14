@@ -17,6 +17,11 @@ class EditUserRolesModal extends React.Component {
         };
     }
 
+    tt(key) {
+        let {t, language} = this.props;
+        return t(key, {lng: language});
+    }
+
     getCurrentRoles() {
         return (this.props.user || {}).roles || [];
     }
