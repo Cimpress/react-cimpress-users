@@ -78,7 +78,8 @@ class UsersTable extends React.Component {
 
 
     componentDidUpdate(prevProps) {
-        if (prevProps.accessToken !== this.props.accessToken && this.props.accessToken) {
+        if ((prevProps.accessToken !== this.props.accessToken && this.props.accessToken) ||
+            (prevProps.groupId !== this.props.groupId && this.props.groupId)) {
             this.currentUserSub = getSubFromJWT(this.props.accessToken);
             this.fetchGroupInfo();
         }
@@ -158,7 +159,8 @@ class UsersTable extends React.Component {
         }
 
         if (this.state.executingRequestError) {
-            return <ErrorInfo error={this.state.executingRequestError} onAcknowledgeClick={() => this.setState({executingRequestError: undefined})}/>;
+            return <ErrorInfo error={this.state.executingRequestError}
+                onAcknowledgeClick={() => this.setState({executingRequestError: undefined})}/>;
         }
 
         if (!this.props.accessToken || !this.state.groupInfo) {

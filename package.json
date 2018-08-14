@@ -1,10 +1,10 @@
 {
   "name": "react-cimpress-users",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A simple user management component based on COAM",
   "main": "./lib/index.js",
   "scripts": {
-    "start": "webpack-dev-server --mode development --open",
+    "start": "webpack-dev-server --mode development --open --port 3000",
     "code-check": "eslint --ext .js --ext .jsx src",
     "build": "node node_modules/grunt-cli/bin/grunt webpack && babel src -d lib --copy-files"
   },

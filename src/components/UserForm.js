@@ -114,7 +114,11 @@ class UserForm extends React.Component {
                             ? <Loading/>
                             : <table className='table table-hover'>
                                 <tbody>
-                                    {(this.state.foundPrincipals || []).map((p) => this.renderUserRow(p, () => this.setState({selectedUser: p})))}
+                                    {this.state.foundPrincipals && this.state.foundPrincipals.length === 0
+                                        ? <tr>
+                                            <td>{this.tt('no_users_found')}</td>
+                                        </tr>
+                                        : (this.state.foundPrincipals || []).map((p) => this.renderUserRow(p, () => this.setState({selectedUser: p})))}
                                 </tbody>
                             </table>}
                     </div>

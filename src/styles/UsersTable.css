@@ -60,3 +60,11 @@
 .rcu-user-row {
     cursor: pointer;
 }
+
+.user-icon-member {
+    color: rgb(105, 117, 130);
+}
+
+.user-icon-admin {
+    color: rgb(214, 54, 37);
+}

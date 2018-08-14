@@ -88,8 +88,8 @@ class UserRow extends React.Component {
                 <div className={'row'}>
                     <div className={'col-sm-4'}>
                         {this.props.user.is_admin
-                            ? <Tooltip contents={this.tt('group_administrator')}><i className={'fa fa-users'}/></Tooltip>
-                            : <Tooltip contents={this.tt('group_member')}><i className={'fa fa-user-o'}/></Tooltip>}
+                            ? <Tooltip contents={this.tt('group_administrator')}><i className={'fa fa-user-plus user-icon-admin'}/></Tooltip>
+                            : <Tooltip contents={this.tt('group_member')}><i className={'fa fa-user user-icon-member'}/></Tooltip>}
                         &nbsp;
                         {this.props.user.profile.name} <span
                             className={'text-muted'}>(<em>{this.props.user.profile.email}</em>)</span>
