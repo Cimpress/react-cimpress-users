@@ -6,7 +6,7 @@ import {translate} from 'react-i18next';
 
 import {searchPrincipals} from '../apis/coam.api';
 
-import {TextField, Toggle} from '@cimpress/react-components';
+import {TextField, Toggle, Tooltip} from '@cimpress/react-components';
 
 import '../styles/UsersTable.css';
 import Loading from './common/Loading';
@@ -14,7 +14,7 @@ import ErrorInfo from './common/ErrorInfo';
 
 import debounce from 'debounce';
 
-class AddNewUserForm extends React.Component {
+class UserForm extends React.Component {
     constructor(props) {
         super(props);
 
@@ -22,7 +22,8 @@ class AddNewUserForm extends React.Component {
             editUserRolesModalOpen: false,
             editUser: undefined,
             searchKey: '',
-            currentRoles: [],
+            currentRoles: this.props.user ? this.props.user.roles : [],
+            isAdmin: this.props.user ? this.props.user.is_admin : false,
         };
 
         this.debouncedSearch = debounce(this.searchPrincipals, 500);
@@ -67,6 +68,12 @@ class AddNewUserForm extends React.Component {
         if (prevProps.accessToken !== this.props.accessToken && this.props.accessToken) {
             this.fetchGroupInfo().then(() => this.fetchRoles());
         }
+
+        if (JSON.stringify(prevProps.user) !== JSON.stringify(this.props.user)) {
+            this.setState({
+                currentRoles: this.props.user ? this.props.user.roles : [],
+            });
+        }
     }
 
     componentDidMount() {
@@ -75,12 +82,17 @@ class AddNewUserForm extends React.Component {
         }
     }
 
-    renderUserRow(u, onClick) {
+    renderUserRow(user, onClick) {
+        let u = user;
+        if (user.profile) {
+            u = user.profile;
+        }
+
         return <tr>
             <td className={'rcu-user-row'} onClick={onClick}>
                 <img src={u.picture} alt="" className={'rcu-user-avatar'}/>
                 {u.name}
-                &nbsp;
+                {' '}
                 <span className={'text-muted'}><em>({u.email})</em></span>
             </td>
         </tr>;
@@ -119,6 +131,17 @@ class AddNewUserForm extends React.Component {
         this.setState({currentRoles: newRolesList});
     }
 
+    getChangedRoles() {
+        if (!this.props.user) {
+            return {'add': this.state.currentRoles};
+        }
+
+        return {
+            'add': this.state.currentRoles.filter((a) => this.props.user.roles.indexOf(a) === -1),
+            'remove': this.props.user.roles.filter((a) => this.state.currentRoles.indexOf(a) === -1),
+        };
+    }
+
     render() {
         if (this.state.executingRequestError) {
             return <ErrorInfo error={this.state.executingRequestError}/>;
@@ -128,14 +151,16 @@ class AddNewUserForm extends React.Component {
             return <Loading message={this.tt('initializing')}/>;
         }
 
-        if (!this.state.selectedUser) {
+        if (!this.state.selectedUser && !this.props.user) {
             return this.renderSearch();
         }
+
+        let user = this.state.selectedUser || this.props.user;
 
         return <div>
             <table className='table table-hover'>
                 <tbody>
-                    {this.renderUserRow(this.state.selectedUser, () => this.setState({selectedUser: undefined}))}
+                    {this.renderUserRow(user, this.props.user ? null : () => this.setState({selectedUser: undefined}))}
                 </tbody>
             </table>
             <div>
@@ -163,9 +188,11 @@ class AddNewUserForm extends React.Component {
                     <tbody>
                         <tr>
                             <td width='100%'>
-                                <h5 className={'text-warning'}><i
-                                    className={'fa fa-info-circle'}/>{this.tt('group_administrator')}</h5>
-                                <em>{this.tt('group_administrator_context_help')}</em>
+                                <Tooltip contents={this.tt('group_administrator_context_help')}>
+                                    <h5 className={'text-warning'}>
+                                        <i className={'fa fa-info-circle'}/>&nbsp;{this.tt('group_administrator')}
+                                    </h5>
+                                </Tooltip>
                             </td>
                             <td align='right'>
                                 <Toggle
@@ -186,8 +213,8 @@ class AddNewUserForm extends React.Component {
                 &nbsp;
                 <button className={'btn btn-primary'}
                     onClick={() => this.props.onConfirm(
-                        this.state.selectedUser,
-                        {'add': this.state.currentRoles},
+                        user,
+                        this.getChangedRoles(),
                         this.state.isAdmin
                     )}>
                     {this.tt('button_confirm')}
@@ -197,11 +224,13 @@ class AddNewUserForm extends React.Component {
     }
 }
 
-AddNewUserForm.propTypes = {
+UserForm.propTypes = {
     // silence eslint
     t: PropTypes.any,
     i18n: PropTypes.any,
     language: PropTypes.string,
+
+    user: PropTypes.object,
 
     accessToken: PropTypes.string,
 
@@ -214,9 +243,9 @@ AddNewUserForm.propTypes = {
     onConfirm: PropTypes.func,
 };
 
-AddNewUserForm.defaultProps = {
+UserForm.defaultProps = {
     language: 'eng',
     readOnly: false,
 };
 
-export default translate('translations', {i18n: getI18nInstance()})(AddNewUserForm);
+export default translate('translations', {i18n: getI18nInstance()})(UserForm);

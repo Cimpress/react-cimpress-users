@@ -16,11 +16,10 @@ import {TabCard, Checkbox, Icon, colors} from '@cimpress/react-components';
 
 import '../styles/UsersTable.css';
 import UserRow from './UserRow';
-import CoamGroupInfo from './GroupInfo';
+import GroupInfo from './GroupInfo';
 import Loading from './common/Loading';
 import ErrorInfo from './common/ErrorInfo';
-import UserRolesModal from './EditUserRolesModal';
-import NewUsersTable from './AddNewUserForm';
+import UserForm from './UserForm';
 
 const atob = require('atob');
 
@@ -73,7 +72,7 @@ class UsersTable extends React.Component {
     fetchGroupInfo() {
         return this.executeRequest(
             getGroupInfo(this.props.accessToken, this.props.groupId),
-            'Loading group information',
+            this.tt('loading_group_information'),
             'groupInfo');
     }
 
@@ -104,7 +103,7 @@ class UsersTable extends React.Component {
                     newGroupInfo.members = newGroupInfo.members.filter((x) => x.principal !== sub);
                     this.setState({groupInfo: newGroupInfo});
                 }),
-            'Delete user.'
+            this.tt('deleting_user')
         );
     }
 
@@ -128,7 +127,7 @@ class UsersTable extends React.Component {
                     newMember.is_admin = isAdmin;
                     this.setState({groupInfo: newGroupInfo});
                 }),
-            `Add/edit user ${sub}`
+            this.tt('adding_or_modifying_user')
         );
     }
 
@@ -140,13 +139,26 @@ class UsersTable extends React.Component {
         return member && member.is_admin === true;
     }
 
+    renderUserForm(user) {
+        return <UserForm
+            accessToken={this.props.accessToken}
+            allowedRoles={this.props.allowedRoles}
+            user={user}
+            onCancel={() => {
+                this.setState({editUser: undefined});
+            }}
+            onConfirm={(user, changes, isAdmin) => {
+                this.setState({editUser: undefined}, () => this.onAddOrEditUser(user, changes, isAdmin));
+            }}/>;
+    }
+
     render() {
         if (this.state.isExecutingRequest) {
-            return <Loading/>;
+            return <Loading message={this.executingRequestCaption}/>;
         }
 
         if (this.state.executingRequestError) {
-            return <ErrorInfo error={this.state.executingRequestError}/>;
+            return <ErrorInfo error={this.state.executingRequestError} onAcknowledgeClick={() => this.setState({executingRequestError: undefined})}/>;
         }
 
         if (!this.props.accessToken || !this.state.groupInfo) {
@@ -158,81 +170,67 @@ class UsersTable extends React.Component {
 
         let tabs = [{
             name: 'Users',
-            block: <div>
-                <div className={'row'}>
-                    <div className={'col-xs-6'} align="left">
-                        <Checkbox
-                            style={{marginTop: '0px'}}
-                            label={this.tt('view_admins_only')} checked={this.state.showAdmins}
-                            onChange={() => this.setState({showAdmins: !this.state.showAdmins})}/>
+            block: this.state.editUser
+                ? this.renderUserForm(this.state.editUser)
+                : <div>
+                    <div className={'row'}>
+                        <div className={'col-xs-6'} align="left">
+                            <Checkbox
+                                style={{marginTop: '0px'}}
+                                label={this.tt('view_admins_only')} checked={this.state.showAdmins}
+                                onChange={() => this.setState({showAdmins: !this.state.showAdmins})}/>
+                        </div>
+                        <div className={'col-xs-6'} align="right">
+                            <span onClick={() => this.fetchGroupInfo()} className={'rcu-icon'}>
+                                <Icon name={'synchronize-3-l'} size={'2x'}
+                                    color={this.props.readOnly ? colors.platinum : colors.shale}/>
+                            </span>
+                        </div>
                     </div>
-                    <div className={'col-xs-6'} align="right">
-                        <span onClick={() => this.fetchGroupInfo()} className={'rcu-icon'}>
-                            <Icon name={'synchronize-3-l'} size={'2x'}
-                                color={this.props.readOnly ? colors.platinum : colors.shale}/>
-                        </span>
-                    </div>
-                </div>
-                <table className='table table-hover'>
-                    <tbody>
-                        {this.state.groupInfo.members
-                            .sort((a, b) => a.profile.name.localeCompare(b.profile.name))
-                            .filter((a) => !this.state.showAdmins || a.is_admin)
-                            .map((m, i) => {
-                                let canModify = !this.props.readOnly && this.currentUserIsAdmin();
-                                return <UserRow key={i}
-                                    user={m}
-                                    allowedRoles={this.props.allowedRoles}
-                                    readOnly={!canModify}
-                                    onDeleteUserClick={!canModify ? null : () => this.onDeleteUser(m)}
-                                    onEditRolesClick={!canModify ? null : () => this.setState({
-                                        editUser: m,
-                                        editUserRolesModalOpen: true,
-                                    })}
-                                />;
-                            })}
-                    </tbody>
-                </table>
-            </div>,
+                    <table className='table table-hover'>
+                        <tbody>
+                            {this.state.groupInfo.members.length == 0
+                                ? <em>No users</em>
+                                : null}
+                            {this.state.groupInfo.members
+                                .sort((a, b) => a.profile.name.localeCompare(b.profile.name))
+                                .filter((a) => !this.state.showAdmins || a.is_admin)
+                                .map((m, i) => {
+                                    let canModify = !this.props.readOnly && this.currentUserIsAdmin();
+                                    return <UserRow key={i}
+                                        user={m}
+                                        currentUserSub={this.currentUserSub}
+                                        allowedRoles={this.props.allowedRoles}
+                                        readOnly={!canModify}
+                                        onDeleteUserClick={!canModify ? null : () => this.onDeleteUser(m)}
+                                        onEditRolesClick={!canModify ? null : () => this.setState({
+                                            editUser: m,
+                                            // editUserRolesModalOpen: true,
+                                        })}
+                                    />;
+                                })}
+                        </tbody>
+                    </table>
+                </div>,
             href: '#',
         }];
 
         if (this.props.showGroupInfo) {
             tabs.push({
                 name: this.tt('tab_group_info_caption'),
-                block: <CoamGroupInfo groupInfo={this.state.groupInfo}/>,
+                block: <GroupInfo groupInfo={this.state.groupInfo}/>,
                 href: '#',
             });
         }
 
         tabs.push({
             name: this.tt('tab_add_user_caption'),
-            block: <NewUsersTable
-                accessToken={this.props.accessToken}
-                allowedRoles={this.props.allowedRoles}
-                onCancel={() => {
-                    this.setState({});
-                }}
-                onConfirm={(user, changes, isAdmin) => {
-                    this.onAddOrEditUser(user, changes, isAdmin);
-                }}/>,
+            block: this.renderUserForm(),
             href: '#',
         });
 
         return (
             <div className='row'>
-                <UserRolesModal
-                    open={this.state.editUserRolesModalOpen}
-                    onCancel={() => this.setState({editUserRolesModalOpen: false, editUser: undefined})}
-                    onConfirm={(changes, isAdmin) => {
-                        this.onAddOrEditUser(this.state.editUser, changes, isAdmin);
-                        this.setState({
-                            editUserRolesModalOpen: false,
-                            editUser: undefined,
-                        });
-                    }}
-                    allowedRoles={this.props.allowedRoles}
-                    user={this.state.editUser}/>
                 <div className='col-sm-12'>
                     <TabCard tabs={tabs} selectedIndex={0}/>
                 </div>

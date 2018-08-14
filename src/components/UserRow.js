@@ -24,13 +24,21 @@ class UserRow extends React.Component {
             name={'pencil-circle-f'} size={'2x'}
             color={this.props.readOnly ? colors.platinum : colors.shale}/>;
 
+        let deleteIcon = <Icon
+            name={'remove-circle-1-f'} size={'2x'}
+            color={this.props.readOnly ? colors.platinum : colors.shale}/>;
+
         if (this.props.readOnly) {
             editIcon = <Tooltip contents={this.tt('editing_disabled')}>{editIcon}</Tooltip>;
+            deleteIcon = <Tooltip contents={this.tt('deleting_disabled')}>{deleteIcon}</Tooltip>;
+        } else {
+            editIcon = <Tooltip contents={this.tt('modify_user_roles')}>{editIcon}</Tooltip>;
+            deleteIcon = <Tooltip contents={this.tt('delete_user')}>{deleteIcon}</Tooltip>;
         }
 
         return <span>
             {filteredRoles.length === 0
-                ? <em className={'badge badge-default'}>No roles</em>
+                ? <em className={'badge badge-default'}>{this.tt('no_roles_defined')}</em>
                 : filteredRoles.map((a, i) => {
                     let style = a.isManagerRole ? 'badge badge-warning' : 'badge badge-info';
                     return <span key={i}><span className={style} style={{float: 'none'}}>
@@ -38,15 +46,14 @@ class UserRow extends React.Component {
                     </span>&nbsp;</span>;
                 })}
             &nbsp;
-            <span className={`rcu-icon ${this.props.readOnly ? 'disabled' : ''}`}
+            <span className={`rcu-icon ${this.props.readOnly ? 'rcu-icon-disabled' : ''}`}
                 onClick={this.props.readOnly ? null : () => this.props.onEditRolesClick()}>
                 {editIcon}
             </span>
             &nbsp;&nbsp;
-            <span className={`rcu-icon ${this.props.readOnly ? 'disabled' : ''}`}
+            <span className={`rcu-icon ${this.props.readOnly ? 'rcu-icon-disabled' : ''}`}
                 onClick={this.props.readOnly ? null : () => this.setState({confirmDelete: true})}>
-                <Icon name={'remove-circle-1-f'} size={'2x'}
-                    color={this.props.readOnly ? colors.platinum : colors.shale}/>
+                {deleteIcon}
             </span>
         </span>;
     }
@@ -81,8 +88,8 @@ class UserRow extends React.Component {
                 <div className={'row'}>
                     <div className={'col-sm-4'}>
                         {this.props.user.is_admin
-                            ? <Tooltip contents={'Group administrator'}><i className={'fa fa-users'}/></Tooltip>
-                            : <Tooltip contents={'Group member'}><i className={'fa fa-user-o'}/></Tooltip>}
+                            ? <Tooltip contents={this.tt('group_administrator')}><i className={'fa fa-users'}/></Tooltip>
+                            : <Tooltip contents={this.tt('group_member')}><i className={'fa fa-user-o'}/></Tooltip>}
                         &nbsp;
                         {this.props.user.profile.name} <span
                             className={'text-muted'}>(<em>{this.props.user.profile.email}</em>)</span>

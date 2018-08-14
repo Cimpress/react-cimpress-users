@@ -39,6 +39,16 @@
     cursor: pointer;
 }
 
+.rcu-icon.rcu-icon-disabled .ij-icon.ij-icon-2x embed, .rcu-icon.rcu-icon-disabled .ij-icon.ij-icon-2x svg {
+    fill: #e1e6eb !important;
+    cursor: not-allowed;
+}
+
+.rcu-icon.rcu-icon-disabled .ij-icon.ij-icon-2x embed:hover, .rcu-icon.rcu-icon-disabled .ij-icon.ij-icon-2x svg:hover {
+    fill: #e1e6eb !important;
+    cursor: not-allowed;
+}
+
 .rcu-user-avatar {
     width: 35px;
     height: 35px;

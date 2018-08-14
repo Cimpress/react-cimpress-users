@@ -53,7 +53,7 @@ export default class App extends Component {
                 caption: 'Simple users table',
                 render: <UsersTable
                     accessToken={this.state.token}
-                    groupId={5223}
+                    groupId={5075}
                     allowedRoles={roles}
                     showAdminsOnly={false}
                 />

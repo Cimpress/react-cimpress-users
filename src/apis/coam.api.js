@@ -141,7 +141,6 @@ export {
     removeUserRole,
     getRoles,
     searchPrincipals,
-
     //
     addGroupMember,
     deleteGroupMember,
