@@ -1,7 +1,7 @@
 import 'regenerator-runtime/runtime';
 
-import UsersList from './UsersList';
+import UsersTable from './components/UsersTable';
 
 export {
-    UsersList
+    UsersTable,
 };

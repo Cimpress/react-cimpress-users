@@ -6,29 +6,27 @@ const defaultRequestData = (accessToken, additionalRequest) => {
         timeout: 3000,
         headers: {
             'Authorization': 'Bearer ' + accessToken,
-            'Cache-control': 'no-cache, no-store, must-revalidate'
-        }
-    }, additionalRequest)
+            'Cache-control': 'no-cache, no-store, must-revalidate',
+        },
+    }, additionalRequest);
 };
 
 const exec = (data) => {
     return axios
         .request(data)
         .then((response) => {
-            console.log(response);
             return response.data;
         })
-        .catch(err => {
+        .catch((err) => {
+            // eslint-disable-next-line no-console
             console.error(err);
             throw err;
-            s
         });
 };
 
 const getGroupInfo = (accessToken, groupId) => {
-
     let data = defaultRequestData(accessToken, {
-        url: `/v1/groups/${groupId}`,
+        url: `/v1/groups/${groupId}?${Math.random() * 1000000}`,
         method: 'GET',
     });
 
@@ -37,12 +35,11 @@ const getGroupInfo = (accessToken, groupId) => {
 
 
 const setAdminFlag = (accessToken, groupId, principal, isAdmin) => {
-
     let data = defaultRequestData(accessToken, {
         url: `/v1/groups/${groupId}/members/${encodeURIComponent(principal)}`,
         method: 'PATCH',
         data: {
-            "is_admin": isAdmin
+            'is_admin': isAdmin,
         },
     });
 
@@ -50,12 +47,11 @@ const setAdminFlag = (accessToken, groupId, principal, isAdmin) => {
 };
 
 const removeUserRole = (accessToken, groupId, principal, role) => {
-
     let data = defaultRequestData(accessToken, {
         url: `/v1/groups/${groupId}/members/${encodeURIComponent(principal)}/roles`,
         method: 'PATCH',
         data: {
-            "remove": [role]
+            'remove': [role],
         },
     });
 
@@ -63,12 +59,48 @@ const removeUserRole = (accessToken, groupId, principal, role) => {
 };
 
 const addUserRole = (accessToken, groupId, principal, role) => {
-
     let data = defaultRequestData(accessToken, {
         url: `/v1/groups/${groupId}/members/${encodeURIComponent(principal)}/roles`,
         method: 'PATCH',
         data: {
-            "add": [role]
+            'add': [role],
+        },
+    });
+
+    return exec(data);
+};
+
+const patchUserRoles = (accessToken, groupId, principal, rolesChanges) => {
+    let data = defaultRequestData(accessToken, {
+        url: `/v1/groups/${groupId}/members/${encodeURIComponent(principal)}/roles`,
+        method: 'PATCH',
+        data: rolesChanges,
+    });
+
+    return exec(data);
+};
+
+const addGroupMember = (accessToken, groupId, principal, isAdmin) => {
+    let data = defaultRequestData(accessToken, {
+        url: `/v1/groups/${groupId}/members`,
+        method: 'PATCH',
+        data: {
+            'add': [{
+                is_admin: !!isAdmin,
+                principal: principal,
+            }],
+        },
+    });
+
+    return exec(data);
+};
+
+const deleteGroupMember = (accessToken, groupId, principal) => {
+    let data = defaultRequestData(accessToken, {
+        url: `/v1/groups/${groupId}/members`,
+        method: 'PATCH',
+        data: {
+            'remove': [principal],
         },
     });
 
@@ -76,51 +108,41 @@ const addUserRole = (accessToken, groupId, principal, role) => {
 };
 
 const getRoles = (accessToken) => {
-
     let data = defaultRequestData(accessToken, {
         url: `/v1/roles`,
-        method: 'GET'
+        method: 'GET',
     });
 
     return exec(data);
 };
 
 const searchPrincipals = (accessToken, query) => {
-    if ( !query || query.length == 0 ) {
+    if (!query || query.length == 0) {
         return Promise.resolve([]);
     }
 
     let data = defaultRequestData(accessToken, {
-       url: '/v1/principals',
-       method: 'GET',
-       params: {
-           q: query
-       }
+        url: '/v1/principals',
+        method: 'GET',
+        params: {
+            q: query,
+        },
     });
 
     // [{user_id / name / email}]
-    return exec(data).then(p => p.principals);
-};
-
-const principalName = (accessToken, userId) => {
-    let url = `${AUTH_SERVICE_URL}/auth/access-management/v1/principals/${userId}`;
-    let init = this.getDefaultConfig('GET');
-
-    let data = defaultRequestData(accessToken, {
-        url: `/v1/principals/${userId}`,
-        method: 'GET'
-    });
-
-    // [{user_id / name / email}]
-    return exec(data);
+    return exec(data).then((p) => p.principals);
 };
 
 export {
     getGroupInfo,
     setAdminFlag,
+    patchUserRoles,
     addUserRole,
     removeUserRole,
     getRoles,
     searchPrincipals,
-    principalName
-}
+
+    //
+    addGroupMember,
+    deleteGroupMember,
+};

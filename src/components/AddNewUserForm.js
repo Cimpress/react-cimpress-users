@@ -8,27 +8,24 @@ import {searchPrincipals} from '../apis/coam.api';
 
 import {TextField, Toggle} from '@cimpress/react-components';
 
-import '../styles/UsersTable.css'
-import Loading from "./common/Loading";
+import '../styles/UsersTable.css';
+import Loading from './common/Loading';
 import ErrorInfo from './common/ErrorInfo';
 
 import debounce from 'debounce';
 
-class NewUsersTable extends React.Component {
+class AddNewUserForm extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            templates: this.props.templates,
-            fetchingTemplates: false,
-            showAdmins: this.props.showAdminsOnly,
             editUserRolesModalOpen: false,
             editUser: undefined,
             searchKey: '',
-            currentRoles: []
+            currentRoles: [],
         };
 
-        this.debouncedSearch = debounce(this.searchPrincipals, 500)
+        this.debouncedSearch = debounce(this.searchPrincipals, 500);
     }
 
     tt(key) {
@@ -39,36 +36,36 @@ class NewUsersTable extends React.Component {
     executeRequest(promise, caption, stateVar) {
         this.setState({
             isExecutingRequest: true,
-            executingRequestCaption: caption
+            executingRequestCaption: caption,
         });
 
         return promise
-            .then(response => {
+            .then((response) => {
                 let state = {isExecutingRequest: false};
                 if (stateVar) {
                     state[stateVar] = response;
                 }
-                this.setState(state)
+                this.setState(state);
             })
-            .catch(error => {
+            .catch((error) => {
                 this.setState({
                     isExecutingRequest: false,
-                    executingRequestError: error
-                })
-            })
+                    executingRequestError: error,
+                });
+            });
     }
 
     searchPrincipals() {
         return this.executeRequest(
             searchPrincipals(this.props.accessToken, this.state.searchKey),
-            'Searching...',
+            this.tt('searching'),
             'foundPrincipals'
-        )
+        );
     }
 
     componentDidUpdate(prevProps) {
         if (prevProps.accessToken !== this.props.accessToken && this.props.accessToken) {
-            this.fetchGroupInfo().then(() => this.fetchRoles())
+            this.fetchGroupInfo().then(() => this.fetchRoles());
         }
     }
 
@@ -86,97 +83,121 @@ class NewUsersTable extends React.Component {
                 &nbsp;
                 <span className={'text-muted'}><em>({u.email})</em></span>
             </td>
-        </tr>
+        </tr>;
     }
 
     renderSearch() {
         return [
-            <div className='row'>
+            <div key={0} className='row'>
                 <div className='col-sm-12'>
                     <TextField label={this.tt('search_for_users')} value={this.state.searchKey} onChange={(v) => {
-                        this.setState({searchKey: v.target.value}, () => this.debouncedSearch())
+                        this.setState({searchKey: v.target.value}, () => this.debouncedSearch());
                     }}/>
                 </div>
             </div>,
-            <div className='row'>
+            <div key={1} className='row'>
                 <div className='col-sm-12'>
                     <div>
                         {this.state.isExecutingRequest
                             ? <Loading/>
                             : <table className='table table-hover'>
                                 <tbody>
-                                {(this.state.foundPrincipals || []).map(p => this.renderUserRow(p, () => this.setState({selectedUser: p})))}
+                                    {(this.state.foundPrincipals || []).map((p) => this.renderUserRow(p, () => this.setState({selectedUser: p})))}
                                 </tbody>
                             </table>}
                     </div>
                 </div>
-            </div>
-        ]
+            </div>,
+        ];
     }
 
     onToggleRole(roleName, isRoleAssigned) {
-        let newRolesList = this.state.currentRoles.slice().filter(r => r !== roleName);
+        let newRolesList = this.state.currentRoles.slice().filter((r) => r !== roleName);
         if (!isRoleAssigned) {
-            newRolesList.push(roleName)
+            newRolesList.push(roleName);
         }
         this.setState({currentRoles: newRolesList});
     }
 
     render() {
-
         if (this.state.executingRequestError) {
             return <ErrorInfo error={this.state.executingRequestError}/>;
         }
 
         if (!this.props.accessToken) {
-            return <Loading message={'Initializing...'}/>
+            return <Loading message={this.tt('initializing')}/>;
         }
 
-        if (!this.state.selectedUser)
+        if (!this.state.selectedUser) {
             return this.renderSearch();
+        }
 
         return <div>
             <table className='table table-hover'>
                 <tbody>
-                {this.renderUserRow(this.state.selectedUser, () => this.setState({selectedUser: undefined}))}
+                    {this.renderUserRow(this.state.selectedUser, () => this.setState({selectedUser: undefined}))}
                 </tbody>
             </table>
             <div>
                 <table className={'table table-hover'}>
                     <tbody>
-                    {this.props.allowedRoles.map(x => {
-                        const isRoleAssigned = this.state.currentRoles.indexOf(x.roleName) !== -1;
-                        return <tr>
+                        {this.props.allowedRoles.map((x, i) => {
+                            const isRoleAssigned = this.state.currentRoles.indexOf(x.roleName) !== -1;
+                            return <tr key={i}>
+                                <td width='100%'>
+                                    <h5>{x.roleCaption || x.roleName}</h5>
+                                </td>
+                                <td align='right'>
+                                    <Toggle
+                                        onText={this.tt('toggle_yes')}
+                                        offText={this.tt('toggle_no')}
+                                        on={isRoleAssigned}
+                                        onClick={() => this.onToggleRole(x.roleName, isRoleAssigned)}
+                                    />
+                                </td>
+                            </tr>;
+                        })}
+                    </tbody>
+                </table>
+                <table className={'table table-hover'}>
+                    <tbody>
+                        <tr>
                             <td width='100%'>
-                                <h5>{x.roleName}</h5>
+                                <h5 className={'text-warning'}><i
+                                    className={'fa fa-info-circle'}/>{this.tt('group_administrator')}</h5>
+                                <em>{this.tt('group_administrator_context_help')}</em>
                             </td>
                             <td align='right'>
                                 <Toggle
-                                    onText={'Yes'}
-                                    offText={'No'}
-                                    on={isRoleAssigned}
-                                    onClick={() => this.onToggleRole(x.roleName, isRoleAssigned)}
+                                    onText={this.tt('toggle_yes')}
+                                    offText={this.tt('toggle_no')}
+                                    on={this.state.isAdmin}
+                                    onClick={() => this.setState({isAdmin: !this.state.isAdmin})}
                                 />
                             </td>
                         </tr>
-                    })}
                     </tbody>
                 </table>
             </div>
             <div align='right'>
                 <button className={'btn btn-default'} onClick={() => this.props.onCancel()}>
-                    Cancel
+                    {this.tt('button_cancel')}
                 </button>
                 &nbsp;
-                <button className={'btn btn-primary'}>
-                    Confirm
+                <button className={'btn btn-primary'}
+                    onClick={() => this.props.onConfirm(
+                        this.state.selectedUser,
+                        {'add': this.state.currentRoles},
+                        this.state.isAdmin
+                    )}>
+                    {this.tt('button_confirm')}
                 </button>
             </div>
-        </div>
+        </div>;
     }
 }
 
-NewUsersTable.propTypes = {
+AddNewUserForm.propTypes = {
     // silence eslint
     t: PropTypes.any,
     i18n: PropTypes.any,
@@ -188,13 +209,14 @@ NewUsersTable.propTypes = {
     allowedRoles: PropTypes.array.isRequired,
 
     readOnly: PropTypes.bool,
-    showAdminsOnly: PropTypes.bool
+
+    onCancel: PropTypes.func,
+    onConfirm: PropTypes.func,
 };
 
-NewUsersTable.defaultProps = {
+AddNewUserForm.defaultProps = {
     language: 'eng',
     readOnly: false,
-    showAdminsOnly: false
 };
 
-export default translate('translations', {i18n: getI18nInstance()})(NewUsersTable);
+export default translate('translations', {i18n: getI18nInstance()})(AddNewUserForm);

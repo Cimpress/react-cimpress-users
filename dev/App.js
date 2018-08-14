@@ -39,10 +39,12 @@ export default class App extends Component {
     getSamples() {
 
         let roles = [{
-            roleName: 'Fulfillment Logistics Manager',
+            roleName: 'Template Editor',
+            roleCaption: 'Editor',
             isManagerRole: true
         }, {
-            roleName: 'Fulfillment Logistics Reader',
+            roleName: 'Template Reader',
+            roleCaption: 'Reader',
             isManagerRole: false
         }];
 
@@ -50,9 +52,10 @@ export default class App extends Component {
             {
                 caption: 'Simple users table',
                 render: <UsersTable
-                    accessToken={this.state.token} groupId={1717}
+                    accessToken={this.state.token}
+                    groupId={5223}
                     allowedRoles={roles}
-                    showAdminsOnly={true}
+                    showAdminsOnly={false}
                 />
             }
         ]

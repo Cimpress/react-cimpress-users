@@ -9,7 +9,7 @@ const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const auth = new Auth0("cimpress.auth0.com", CLIENT_ID, CLIENT_SECRET);
 
 let plugin = new CimpressTranslationsWebpackPlugin({
-    serviceId: "14105bd8-499b-451c-aa35-1a79ee651405",
+    serviceId: "8a76a642-dd82-41d0-887f-604ff91901c9",
     path: path.join(__dirname, "./src/locales/translations.json"),
     authorizer: {
         getAccessToken: async () => await auth.getAccessTokenUsingRefreshToken()

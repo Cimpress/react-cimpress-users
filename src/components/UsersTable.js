@@ -1,31 +1,45 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import merge from 'deepmerge';
 
 import {getI18nInstance} from '../i18n';
 import {translate} from 'react-i18next';
 
-import {getGroupInfo, setAdminFlag, addUserRole, removeUserRole, getRoles} from '../apis/coam.api';
+import {
+    getGroupInfo,
+    patchUserRoles,
+    addGroupMember,
+    deleteGroupMember,
+} from '../apis/coam.api';
 
-import {TabCard, Checkbox} from '@cimpress/react-components';
+import {TabCard, Checkbox, Icon, colors} from '@cimpress/react-components';
 
-import '../styles/UsersTable.css'
-import UserRow from "./UserRow";
-import CoamGroupInfo from "./CoamGroupInfo";
-import Loading from "./common/Loading";
+import '../styles/UsersTable.css';
+import UserRow from './UserRow';
+import CoamGroupInfo from './GroupInfo';
+import Loading from './common/Loading';
 import ErrorInfo from './common/ErrorInfo';
-import UserRolesModal from "./UserRolesModal";
-import NewUsersTable from "./NewUsersTable";
+import UserRolesModal from './EditUserRolesModal';
+import NewUsersTable from './AddNewUserForm';
+
+const atob = require('atob');
+
+function getSubFromJWT(jwt) {
+    try {
+        return JSON.parse(atob(jwt.split('.')[1])).sub;
+    } catch (e) {
+        return null;
+    }
+}
 
 class UsersTable extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            templates: this.props.templates,
-            fetchingTemplates: false,
             showAdmins: this.props.showAdminsOnly,
             editUserRolesModalOpen: false,
-            editUser: undefined
+            editUser: undefined,
         };
     }
 
@@ -37,43 +51,37 @@ class UsersTable extends React.Component {
     executeRequest(promise, caption, stateVar) {
         this.setState({
             isExecutingRequest: true,
-            executingRequestCaption: caption
+            executingRequestCaption: caption,
         });
 
         return promise
-            .then(response => {
+            .then((response) => {
                 let state = {isExecutingRequest: false};
                 if (stateVar) {
                     state[stateVar] = response;
                 }
-                this.setState(state)
+                this.setState(state);
             })
-            .catch(error => {
+            .catch((error) => {
                 this.setState({
                     isExecutingRequest: false,
-                    executingRequestError: error
-                })
-            })
+                    executingRequestError: error,
+                });
+            });
     }
 
     fetchGroupInfo() {
         return this.executeRequest(
             getGroupInfo(this.props.accessToken, this.props.groupId),
             'Loading group information',
-            'groupInfo')
+            'groupInfo');
     }
 
-    fetchRoles() {
-        return this.executeRequest(
-            getRoles(this.props.accessToken),
-            'Loading roles...',
-            'coamRoles'
-        )
-    }
 
     componentDidUpdate(prevProps) {
         if (prevProps.accessToken !== this.props.accessToken && this.props.accessToken) {
-            this.fetchGroupInfo().then(() => this.fetchRoles())
+            this.currentUserSub = getSubFromJWT(this.props.accessToken);
+            this.fetchGroupInfo();
         }
     }
 
@@ -82,36 +90,59 @@ class UsersTable extends React.Component {
             return;
         }
 
-        this.fetchGroupInfo().then(() => this.fetchRoles())
+        this.fetchGroupInfo();
+        this.currentUserSub = getSubFromJWT(this.props.accessToken);
     }
 
-    onToggleAdmin(user) {
+    onDeleteUser(user) {
+        let sub = user.principal || user.user_id;
+        const newGroupInfo = merge(this.state.groupInfo, {});
+
         this.executeRequest(
-            setAdminFlag(this.props.accessToken, this.props.groupId, user.principal, !user.is_admin)
-                .then(() => this.fetchGroupInfo()),
-            `Updating admin access for ${user.principal}`)
+            deleteGroupMember(this.props.accessToken, this.props.groupId, sub)
+                .then((newData) => {
+                    newGroupInfo.members = newGroupInfo.members.filter((x) => x.principal !== sub);
+                    this.setState({groupInfo: newGroupInfo});
+                }),
+            'Delete user.'
+        );
     }
 
-    onRemoveRole(user, roleName) {
-        alert(`Remove ${roleName} from ${user.profile.name}...`);
+    onAddOrEditUser(user, rolesChanges, isAdmin) {
+        let sub = user.principal || user.user_id;
+        const newGroupInfo = merge(this.state.groupInfo, {});
+
         this.executeRequest(
-            removeUserRole(this.props.accessToken, this.props.groupId, user.principal, roleName)
-                .then(() => this.fetchGroupInfo()),
-            `Removing role ${roleName} from ${user.principal}`)
+            addGroupMember(this.props.accessToken, this.props.groupId, sub, isAdmin)
+                .then((newData) => {
+                    const newMember = newData.members.find((nm) => nm.principal === sub);
+                    if (!newGroupInfo.members.find((existingUser) => existingUser.principal === sub)) {
+                        newGroupInfo.members.push(Object.assign({}, newMember, {profile: user}));
+                    }
+                    return Promise.resolve();
+                })
+                .then(() => patchUserRoles(this.props.accessToken, this.props.groupId, sub, rolesChanges))
+                .then((newData) => {
+                    const newMember = newGroupInfo.members.find((x) => x.principal === sub);
+                    newMember.roles = newData.roles;
+                    newMember.is_admin = isAdmin;
+                    this.setState({groupInfo: newGroupInfo});
+                }),
+            `Add/edit user ${sub}`
+        );
     }
 
-    onAddRole(user, roleName) {
-        alert(`Add ${roleName} to ${user.profile.name}...`);
-        this.executeRequest(
-            addUserRole(this.props.accessToken, this.props.groupId, user.principal, roleName)
-                .then(() => this.fetchGroupInfo()),
-            `Adding role ${roleName} to ${user.principal}`)
+    currentUserIsAdmin() {
+        if (!this.state.groupInfo) {
+            return false;
+        }
+        let member = this.state.groupInfo.members.find((x) => x.principal === this.currentUserSub);
+        return member && member.is_admin === true;
     }
 
     render() {
-
         if (this.state.isExecutingRequest) {
-            return <Loading/>
+            return <Loading/>;
         }
 
         if (this.state.executingRequestError) {
@@ -119,67 +150,73 @@ class UsersTable extends React.Component {
         }
 
         if (!this.props.accessToken || !this.state.groupInfo) {
-            return <Loading message={'Initializing...'}/>
+            return <Loading message={this.tt('initializing')}/>;
         }
 
         // let totalUsers = ((this.state.groupInfo || {}).members || []).length;
         // let admins = ((this.state.groupInfo || {}).members || []).filter(a => a.is_admin).length;
 
-        let tabs = [
-            {
-                name: 'Users',
-                block:
-                    <div>
-                        <div className={'row'}>
-                            <div className={'col-xs-6'} align="left">
-                                <Checkbox
-                                    label={'View admins only'} checked={this.state.showAdmins}
-                                    onChange={() => this.setState({showAdmins: !this.state.showAdmins})}/>
-                            </div>
-                            <div className={'col-xs-6'} align="right">
-                                <button className={`btn btn-link ${this.props.readOnly ? 'disabled' : ''}`}>
-                                    <i className={'fa fa-plus'}/>
-                                    Add...
-                                </button>
-                            </div>
-                        </div>
-                        <table className='table table-hover'>
-                            <tbody>
-                            {this.state.groupInfo.members
-                                .sort((a, b) => a.profile.name.localeCompare(b.profile.name))
-                                .filter(a => !this.state.showAdmins || a.is_admin)
-                                .map(m =>
-                                    <UserRow
-                                        user={m}
-                                        allowedRoles={this.props.allowedRoles}
-                                        readOnly={this.props.readOnly}
-                                        onEditRolesClick={this.props.readOnly ? null : () => this.setState({
-                                            editUser: m,
-                                            editUserRolesModalOpen: true
-                                        })}
-                                    />
-                                )}
-                            </tbody>
-                        </table>
-                    </div>,
-                href: '#'
-            }];
+        let tabs = [{
+            name: 'Users',
+            block: <div>
+                <div className={'row'}>
+                    <div className={'col-xs-6'} align="left">
+                        <Checkbox
+                            style={{marginTop: '0px'}}
+                            label={this.tt('view_admins_only')} checked={this.state.showAdmins}
+                            onChange={() => this.setState({showAdmins: !this.state.showAdmins})}/>
+                    </div>
+                    <div className={'col-xs-6'} align="right">
+                        <span onClick={() => this.fetchGroupInfo()} className={'rcu-icon'}>
+                            <Icon name={'synchronize-3-l'} size={'2x'}
+                                color={this.props.readOnly ? colors.platinum : colors.shale}/>
+                        </span>
+                    </div>
+                </div>
+                <table className='table table-hover'>
+                    <tbody>
+                        {this.state.groupInfo.members
+                            .sort((a, b) => a.profile.name.localeCompare(b.profile.name))
+                            .filter((a) => !this.state.showAdmins || a.is_admin)
+                            .map((m, i) => {
+                                let canModify = !this.props.readOnly && this.currentUserIsAdmin();
+                                return <UserRow key={i}
+                                    user={m}
+                                    allowedRoles={this.props.allowedRoles}
+                                    readOnly={!canModify}
+                                    onDeleteUserClick={!canModify ? null : () => this.onDeleteUser(m)}
+                                    onEditRolesClick={!canModify ? null : () => this.setState({
+                                        editUser: m,
+                                        editUserRolesModalOpen: true,
+                                    })}
+                                />;
+                            })}
+                    </tbody>
+                </table>
+            </div>,
+            href: '#',
+        }];
 
-        if (this.props.showGroupInfo)
+        if (this.props.showGroupInfo) {
             tabs.push({
-                    name: 'Group info',
-                    block: <CoamGroupInfo groupInfo={this.state.groupInfo}/>,
-                    href: '#'
-                });
+                name: this.tt('tab_group_info_caption'),
+                block: <CoamGroupInfo groupInfo={this.state.groupInfo}/>,
+                href: '#',
+            });
+        }
 
         tabs.push({
-            name: 'Add user...',
+            name: this.tt('tab_add_user_caption'),
             block: <NewUsersTable
-                accessToken={this.props.accessToken} allowedRoles={this.props.allowedRoles}
+                accessToken={this.props.accessToken}
+                allowedRoles={this.props.allowedRoles}
                 onCancel={() => {
-                    this.setState({})
+                    this.setState({});
+                }}
+                onConfirm={(user, changes, isAdmin) => {
+                    this.onAddOrEditUser(user, changes, isAdmin);
                 }}/>,
-            href: '#'
+            href: '#',
         });
 
         return (
@@ -187,9 +224,12 @@ class UsersTable extends React.Component {
                 <UserRolesModal
                     open={this.state.editUserRolesModalOpen}
                     onCancel={() => this.setState({editUserRolesModalOpen: false, editUser: undefined})}
-                    onConfirm={(changes) => {
-                        this.setState({editUserRolesModalOpen: false, editUser: undefined});
-                        console.log(changes)
+                    onConfirm={(changes, isAdmin) => {
+                        this.onAddOrEditUser(this.state.editUser, changes, isAdmin);
+                        this.setState({
+                            editUserRolesModalOpen: false,
+                            editUser: undefined,
+                        });
                     }}
                     allowedRoles={this.props.allowedRoles}
                     user={this.state.editUser}/>
@@ -197,7 +237,7 @@ class UsersTable extends React.Component {
                     <TabCard tabs={tabs} selectedIndex={0}/>
                 </div>
             </div>
-        )
+        );
     }
 }
 
@@ -212,17 +252,18 @@ UsersTable.propTypes = {
     // roles to allow to assign to
     allowedRoles: PropTypes.array.isRequired,
 
+    groupId: PropTypes.number,
     showGroupInfo: PropTypes.bool,
 
     readOnly: PropTypes.bool,
-    showAdminsOnly: PropTypes.bool
+    showAdminsOnly: PropTypes.bool,
 };
 
 UsersTable.defaultProps = {
     language: 'eng',
     readOnly: false,
     showAdminsOnly: false,
-    showGroupInfo: false
+    showGroupInfo: false,
 };
 
 export default translate('translations', {i18n: getI18nInstance()})(UsersTable);
