@@ -1,19 +1,19 @@
 # react-cimpress-users
 Thin React component to help managing Cimpress user access
+
+## Overview 
+The purpose of this package is to provide simple **and** embedded COAM Authorization management
+for React (or Vue) applications.
  
-###  What
-I would like to manage the access to my application inside the application itself. 
-I still want to benefit managing permissions with COAM.
+The **UsersTable** component provides the ability to add, edit or remove users within a single COAM group.
 
-###  How
+To simplify even more the access management, the component requires a list of roles that should 
+be considered. Other existing roles will neither be shown nor managed to avoid possible conflicts. 
 
-**UsersTable** - is a simple react component that provides you the ability to add, edit or 
-remove users within a single COAM group.
+The component was designed to fit in a Drawer, but can also be used inline (within a page) to get better experience.
 
-Since it's a thin component, it was designed to fit in a Drawer, but can also be used inline
-to get better experience.
 
-##### How to use it
+## Usage
 
 Install the package:
     
@@ -37,9 +37,9 @@ Add to your code
         />
         
 The component requires:
-- accessToken - to make sure it can communicate with COAM
-- groupId - the identifier of the group that will be managed
-- allowedRoles - a list of roles definition that should be managed by the component. 
+- **accessToken** - to make sure it can communicate with COAM
+- **groupId** - the identifier of the group that will be managed
+- **allowedRoles** - a list of roles definition that should be managed by the component. 
 The idea behind this list is to provide very targeted experience suitable only for the 
 application where the component is integrated with. In majority of cases, users need to have
 only a few roles assigned to be able to use the application. Each role has **roleName** (required) that 
