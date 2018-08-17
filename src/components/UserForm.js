@@ -159,7 +159,7 @@ class UserForm extends React.Component {
                     <RadioGroup
                         defaultSelected={selected}
                         onChange={(e, v) => this.setState({currentRoles: [v]})}>{this.props.allowedRoles.map((x, i) =>
-                        <Radio
+                            <Radio
                                 key={i}
                                 className={'rcu-radio'}
                                 label={<h5>{x.roleCaption || x.roleName}</h5>}
