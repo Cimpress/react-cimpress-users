@@ -4,7 +4,9 @@
   "description": "A simple user management component based on COAM",
   "main": "./lib/index.js",
   "scripts": {
-    "start": "webpack-dev-server --mode development --open --port 3000",
+    "start": "start-storybook -p 3000",
+    "storybook": "start-storybook -p 3000",
+    "build-storybook": "build-storybook",
     "code-check": "eslint --ext .js --ext .jsx src",
     "build": "node node_modules/grunt-cli/bin/grunt webpack && babel src -d lib --copy-files"
   },
@@ -12,7 +14,15 @@
     "lib"
   ],
   "author": "TrdelnikSquad@cimpress.com",
-  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cimpress/react-cimpress-users.git"
+  },
+  "homepage": "https://github.com/Cimpress/react-cimpress-users#readme",
+  "bugs": {
+    "url": "https://github.com/Cimpress/react-cimpress-users/issues"
+  },
+  "license": "ISC",
   "peerDependencies": {
     "react": "^15.0.0 || ^16.0.0",
     "react-dom": "^15.0.0 || ^16.0.0",
@@ -22,12 +32,18 @@
     "@babel/preset-env": "^7.0.0-beta.55",
     "@babel/preset-react": "^7.0.0-beta.55",
     "@cimpress/react-components": "^4.7.3",
+    "@storybook/addon-actions": "^4.0.0-alpha.16",
+    "@storybook/addon-links": "^4.0.0-alpha.16",
+    "@storybook/addons": "^4.0.0-alpha.16",
+    "@storybook/react": "^4.0.0-alpha.16",
     "auth0-sso-login": "^3.0.115",
     "aws-sdk": "^2.286.2",
     "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
     "babel-loader": "^7.1.5",
     "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",
+    "babel-runtime": "^6.26.0",
     "cimpress-translations": "^2.1.4",
     "cimpress-translations-webpack-plugin": "^1.1.10",
     "css-loader": "^1.0.0",
@@ -37,7 +53,6 @@
     "grunt": "^1.0.3",
     "grunt-cli": "^1.2.0",
     "grunt-webpack": "^3.1.2",
-    "html-webpack-plugin": "^3.2.0",
     "jwt-decode": "^2.2.0",
     "load-grunt-tasks": "^4.0.0",
     "react": "^16.4.2",
