@@ -14,7 +14,15 @@
     "lib"
   ],
   "author": "TrdelnikSquad@cimpress.com",
-  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cimpress/react-cimpress-users.git"
+  },
+  "homepage": "https://github.com/Cimpress/react-cimpress-users#readme",
+  "bugs": {
+    "url": "https://github.com/Cimpress/react-cimpress-users/issues"
+  },
+  "license": "ISC",
   "peerDependencies": {
     "react": "^15.0.0 || ^16.0.0",
     "react-dom": "^15.0.0 || ^16.0.0",
