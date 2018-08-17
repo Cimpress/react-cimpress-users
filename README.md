@@ -50,7 +50,7 @@ will be used to pass to COAM, **roleCaption** (optional) that would be used with
 
 1. Clone the repository
     
-        git clone https://github.com/Cimpress/react-cimpress-comment
+        git clone https://github.com/Cimpress/react-cimpress-users
         
 2. Ensure you have the following environment variables set. These are used to get Auth0 token to be able to 
 download the translations files in the next step.
