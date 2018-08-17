@@ -6,7 +6,7 @@ import {translate} from 'react-i18next';
 
 import {searchPrincipals} from '../apis/coam.api';
 
-import {TextField, Toggle, Tooltip} from '@cimpress/react-components';
+import {TextField, Tooltip, Checkbox, Icon, RadioGroup, Radio} from '@cimpress/react-components';
 
 import '../styles/UsersTable.css';
 import Loading from './common/Loading';
@@ -146,6 +146,45 @@ class UserForm extends React.Component {
         };
     }
 
+    renderRolesSelections() {
+        if (this.props.mutuallyExclusiveRoles) {
+            let selected = undefined;
+            this.props.allowedRoles.forEach((x, i) => {
+                if (this.state.currentRoles.indexOf(x.roleName) !== -1) {
+                    selected = x.roleName;
+                }
+            });
+            return <div>
+                <form>
+                    <RadioGroup
+                        defaultSelected={selected}
+                        onChange={(e, v) => this.setState({currentRoles: [v]})}>{this.props.allowedRoles.map((x, i) =>
+                            <Radio
+                                key={i}
+                                className={'rcu-radio'}
+                                label={<h5>{x.roleCaption || x.roleName}</h5>}
+                                value={x.roleName}/>)}
+                    </RadioGroup>
+                </form>
+            </div>;
+        }
+
+        return this.props.allowedRoles.map((x, i) => {
+            const isRoleAssigned = this.state.currentRoles.indexOf(x.roleName) !== -1;
+            return <div key={i} className={'clearfix rcu-checkbox-row'}
+                onClick={() => this.onToggleRole(x.roleName, isRoleAssigned)}>
+                <Checkbox
+                    label={<h5 style={{display: 'inline'}}>{x.roleCaption || x.roleName}</h5>}
+                    checked={isRoleAssigned}
+                    onChange={(e) => {
+                        e.stopPropagation();
+                        this.onToggleRole(x.roleName, isRoleAssigned);
+                    }}
+                />
+            </div>;
+        });
+    }
+
     render() {
         if (this.state.executingRequestError) {
             return <ErrorInfo error={this.state.executingRequestError}/>;
@@ -167,48 +206,29 @@ class UserForm extends React.Component {
                     {this.renderUserRow(user, this.props.user ? null : () => this.setState({selectedUser: undefined}))}
                 </tbody>
             </table>
-            <div>
-                <table className={'table table-hover'}>
-                    <tbody>
-                        {this.props.allowedRoles.map((x, i) => {
-                            const isRoleAssigned = this.state.currentRoles.indexOf(x.roleName) !== -1;
-                            return <tr key={i}>
-                                <td width='100%'>
-                                    <h5>{x.roleCaption || x.roleName}</h5>
-                                </td>
-                                <td align='right'>
-                                    <Toggle
-                                        onText={this.tt('toggle_yes')}
-                                        offText={this.tt('toggle_no')}
-                                        on={isRoleAssigned}
-                                        onClick={() => this.onToggleRole(x.roleName, isRoleAssigned)}
-                                    />
-                                </td>
-                            </tr>;
-                        })}
-                    </tbody>
-                </table>
-                <table className={'table table-hover'}>
-                    <tbody>
-                        <tr>
-                            <td width='100%'>
-                                <Tooltip contents={this.tt('group_administrator_context_help')}>
-                                    <h5 className={'text-warning'}>
-                                        <i className={'fa fa-info-circle'}/>&nbsp;{this.tt('group_administrator')}
-                                    </h5>
-                                </Tooltip>
-                            </td>
-                            <td align='right'>
-                                <Toggle
-                                    onText={this.tt('toggle_yes')}
-                                    offText={this.tt('toggle_no')}
-                                    on={this.state.isAdmin}
-                                    onClick={() => this.setState({isAdmin: !this.state.isAdmin})}
-                                />
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div className={'rcu-checkbox-list'}>
+                {this.renderRolesSelections()}
+                <div className={'clearfix rcu-checkbox-row'}
+                    onClick={() => this.setState({isAdmin: !this.state.isAdmin})}>
+                    <Checkbox
+                        inline
+                        label={<h5 className={'text-warning'} style={{display: 'inline'}}>
+                            {this.tt('group_administrator')}
+                        </h5>}
+                        checked={this.state.isAdmin}
+                        onChange={(e) => {
+                            e.stopPropagation();
+                            this.setState({isAdmin: !this.state.isAdmin});
+                        }}
+                    />
+                    <div className={'pull-right'}>
+                        <Tooltip contents={this.tt('group_administrator_context_help')}>
+                            <span className={'rcu-info-icon'}>
+                                <Icon name={'infomation-circle-l'} size={'2x'}/>
+                            </span>
+                        </Tooltip>
+                    </div>
+                </div>
             </div>
             <div align='right'>
                 <button className={'btn btn-default'} onClick={() => this.props.onCancel()}>
@@ -240,6 +260,7 @@ UserForm.propTypes = {
 
     // roles to allow to assign to
     allowedRoles: PropTypes.array.isRequired,
+    mutuallyExclusiveRoles: PropTypes.bool,
 
     readOnly: PropTypes.bool,
 
@@ -250,6 +271,7 @@ UserForm.propTypes = {
 UserForm.defaultProps = {
     language: 'eng',
     readOnly: false,
+    mutuallyExclusiveRoles: false,
 };
 
 export default translate('translations', {i18n: getI18nInstance()})(UserForm);

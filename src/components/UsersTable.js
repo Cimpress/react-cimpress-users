@@ -50,12 +50,16 @@ class UsersTable extends React.Component {
     executeRequest(promise, caption, stateVar) {
         this.setState({
             isExecutingRequest: true,
+            executingRequestError: undefined,
             executingRequestCaption: caption,
         });
 
         return promise
             .then((response) => {
-                let state = {isExecutingRequest: false};
+                let state = {
+                    isExecutingRequest: false,
+                    executingRequestError: undefined,
+                };
                 if (stateVar) {
                     state[stateVar] = response;
                 }
@@ -82,6 +86,11 @@ class UsersTable extends React.Component {
             (prevProps.groupId !== this.props.groupId && this.props.groupId)) {
             this.currentUserSub = getSubFromJWT(this.props.accessToken);
             this.fetchGroupInfo();
+        }
+        if (prevProps.showAdminsOnly !== this.props.showAdminsOnly) {
+            this.setState({
+                showAdmins: this.props.showAdminsOnly,
+            });
         }
     }
 
@@ -144,6 +153,7 @@ class UsersTable extends React.Component {
         return <UserForm
             accessToken={this.props.accessToken}
             allowedRoles={this.props.allowedRoles}
+            mutuallyExclusiveRoles={this.props.mutuallyExclusiveRoles}
             user={user}
             onCancel={() => {
                 this.setState({editUser: undefined});
@@ -166,9 +176,6 @@ class UsersTable extends React.Component {
         if (!this.props.accessToken || !this.state.groupInfo) {
             return <Loading message={this.tt('initializing')}/>;
         }
-
-        // let totalUsers = ((this.state.groupInfo || {}).members || []).length;
-        // let admins = ((this.state.groupInfo || {}).members || []).filter(a => a.is_admin).length;
 
         let tabs = [{
             name: 'Users',
@@ -207,7 +214,6 @@ class UsersTable extends React.Component {
                                         onDeleteUserClick={!canModify ? null : () => this.onDeleteUser(m)}
                                         onEditRolesClick={!canModify ? null : () => this.setState({
                                             editUser: m,
-                                            // editUserRolesModalOpen: true,
                                         })}
                                     />;
                                 })}
@@ -251,6 +257,7 @@ UsersTable.propTypes = {
 
     // roles to allow to assign to
     allowedRoles: PropTypes.array.isRequired,
+    mutuallyExclusiveRoles: PropTypes.bool,
 
     groupId: PropTypes.number,
     showGroupInfo: PropTypes.bool,
@@ -262,6 +269,7 @@ UsersTable.propTypes = {
 UsersTable.defaultProps = {
     language: 'eng',
     readOnly: false,
+    mutuallyExclusiveRoles: false,
     showAdminsOnly: false,
     showGroupInfo: false,
 };

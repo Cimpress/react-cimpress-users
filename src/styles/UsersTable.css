@@ -18,14 +18,19 @@
     color: #fee;
 }
 
-.rcu-icon .ij-icon.ij-icon-2x {
+.rcu-icon .ij-icon.ij-icon-2x, .rcu-info-icon .ij-icon.ij-icon-2x {
     width: 24px;
     height: 24px;
     padding-top: 4px;
     padding-left: 2px;
 }
 
-.rcu-icon .ij-icon.ij-icon-2x embed, .rcu-icon .ij-icon.ij-icon-2x svg {
+.rcu-info-icon .ij-icon.ij-icon-2x {
+    padding-top: 0px;
+}
+
+
+.rcu-icon .ij-icon.ij-icon-2x embed, .rcu-icon .ij-icon.ij-icon-2x svg, .rcu-info-icon .ij-icon.ij-icon-2x svg {
     transform: scale(calc(24 / 24));
 }
 
@@ -67,4 +72,43 @@
 
 .user-icon-admin {
     color: rgb(214, 54, 37);
+}
+
+.rcu-checkbox-list {
+    margin-bottom: 20px;
+}
+
+.rcu-checkbox-row {
+    border: 1px solid #e1e6eb;
+    border-bottom: 0px;
+    padding: 20px;
+}
+
+.rcu-checkbox-list > .rcu-checkbox-row:last-child {
+    border-bottom: 1px solid #e1e6eb;
+}
+
+.rcu-checkbox-list .rcu-radio {
+    border: 1px solid #e1e6eb;
+    border-bottom: 0px;
+    padding: 20px;
+    margin-bottom: 0px;
+    margin-right: 0px;
+}
+
+.rcu-radio {
+    margin-right: 0px !important;
+}
+
+.rcu-radio h5 {
+    display:  inline;
+}
+
+.rcu-checkbox-row .checkbox {
+    display: inline;
+}
+
+.rcu-checkbox-row:hover {
+    background-color: #edf3f9;
+    cursor: pointer;
 }
