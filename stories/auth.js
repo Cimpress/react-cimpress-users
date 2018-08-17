@@ -18,12 +18,10 @@ class Auth {
             hooks: {
                 profileRefreshed: (value) => {
                     this.profile = value;
-                    this.reportIdentity();
                     localStorage.setItem('profile', JSON.stringify(this.profile));
                 },
                 tokenRefreshed: () => {
                     this.accessToken = this.ssoAuth.getIdToken();
-                    this.reportIdentity();
                     localStorage.setItem('accessToken', this.accessToken);
                 },
             },
@@ -69,7 +67,6 @@ class Auth {
             accessToken = decodedToken.exp > (Date.now() / 1000)
                 ? accessToken
                 : null;
-            this.reportIdentity();
         }
         return !!accessToken;
     }

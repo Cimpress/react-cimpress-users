@@ -45,3 +45,34 @@ application where the component is integrated with. In majority of cases, users 
 only a few roles assigned to be able to use the application. Each role has **roleName** (required) that 
 will be used to pass to COAM, **roleCaption** (optional) that would be used within the UI and 
 **isManagerRole** (optional) that will be used to color the role differently.
+
+## Development
+
+1. Clone the repository
+    
+        git clone https://github.com/Cimpress/react-cimpress-comment
+        
+2. Ensure you have the following environment variables set. These are used to get Auth0 token to be able to 
+download the translations files in the next step.
+    
+        export CLIENT_ID=<...>
+        export CLIENT_SECRET=<...>
+        
+3. Run the following command to download the language translations files. 
+        
+        npm run build
+
+4. For developing, we use [Storybook](https://github.com/storybooks/storybook). You can run and see
+the stories with:
+        
+        npm run storybook
+        
+5. Make sure your code passes the linting rules
+        
+        npm run code-check
+        
+6. Make sure to update **package.json** with the new version of the package (please follow 
+[semantic versioning](https://semver.org/). After, please also update **CHANGELOG.md** file 
+with short info for the changes in this new version.   
+
+7. Don't forget to enjoy!

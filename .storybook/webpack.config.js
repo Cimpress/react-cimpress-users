@@ -1,10 +1,3 @@
-const HtmlWebPackPlugin = require("html-webpack-plugin");
-
-const htmlPlugin = new HtmlWebPackPlugin({
-    template: "./dev/index.html",
-    filename: "./index.html"
-});
-
 module.exports = {
     entry: "./dev/index.js",
     module: {
