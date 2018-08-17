@@ -18,14 +18,8 @@ export default class Authenticated extends React.Component {
         let profile = auth.getProfile();
 
 
-        return <div style={{padding: '20px'}}>
-            <div style={{
-                padding: '5px',
-                border: '1px solid #eee',
-                background: '#fff',
-                marginBottom: '10px',
-                boxShadome: '0 2px 2px 0 rgba(0,0,0,.1)',
-            }}>
+        return <div>
+            <div className={'active-user-box'}>
                 <em className={'text-muted'}>{profile.name} ({profile.email})</em>
             </div>
             {
