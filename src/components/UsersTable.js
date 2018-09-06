@@ -175,6 +175,7 @@ class UsersTable extends React.Component {
 
     renderUserForm(user) {
         return <UserForm
+            language={this.props.language}
             accessToken={this.props.accessToken}
             allowedRoles={this.props.allowedRoles}
             mutuallyExclusiveRoles={this.props.mutuallyExclusiveRoles}
@@ -210,6 +211,7 @@ class UsersTable extends React.Component {
                             .map((m, i) => {
                                 let canModify = !this.props.readOnly && this.currentUserIsAdmin();
                                 return <UserRow
+                                    language={this.props.language}
                                     key={i}
                                     user={m}
                                     currentUserSub={this.currentUserSub}
@@ -275,17 +277,18 @@ class UsersTable extends React.Component {
 
     render() {
         if (this.state.isExecutingRequest) {
-            return <Loading message={this.executingRequestCaption}/>;
+            return <Loading language={this.props.language} message={this.executingRequestCaption}/>;
         }
 
         if (this.state.executingRequestError) {
             return <ErrorInfo
+                language={this.props.language}
                 error={this.state.executingRequestError}
                 onAcknowledgeClick={() => this.setState({executingRequestError: undefined})}/>;
         }
 
         if (!this.props.accessToken || !this.state.groupInfo) {
-            return <Loading message={this.tt('initializing')}/>;
+            return <Loading language={this.props.language} message={this.tt('initializing')}/>;
         }
 
         let content = this.renderUsers();

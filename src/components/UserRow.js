@@ -86,7 +86,7 @@ class UserRow extends React.Component {
     renderUserName(isCurrentUser) {
         let meLabel = isCurrentUser
             ? <Tooltip contents={this.tt('this_is_you_tooltip')}>
-                <Icon name={'rank-army-star-2-f'} size={'1x'} color={colors.info.base}/>
+                <Icon name={'rank-army-star-2-f'} color={colors.info.base}/>
             </Tooltip>
             : null;
 
@@ -103,6 +103,8 @@ class UserRow extends React.Component {
         if (this.state.confirmDelete) {
             return this.renderConfirmDelete();
         }
+
+        console.log(this.props)
 
         return <tr>
             <td style={{paddingRight: '10px', paddingLeft: '10px'}}>
@@ -140,7 +142,7 @@ UserRow.propTypes = {
     // display
     language: PropTypes.string,
 
-    currentUserSub: PropTypes.bool,
+    currentUserSub: PropTypes.string,
 
     user: PropTypes.object.isRequired,
 

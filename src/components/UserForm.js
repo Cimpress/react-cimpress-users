@@ -111,7 +111,7 @@ class UserForm extends React.Component {
                 <div className='col-sm-12'>
                     <div>
                         {this.state.isExecutingRequest
-                            ? <Loading/>
+                            ? <Loading language={this.props.language}/>
                             : <table className='table table-hover'>
                                 <tbody>
                                     {this.state.foundPrincipals && this.state.foundPrincipals.length === 0
@@ -187,11 +187,11 @@ class UserForm extends React.Component {
 
     render() {
         if (this.state.executingRequestError) {
-            return <ErrorInfo error={this.state.executingRequestError}/>;
+            return <ErrorInfo language={this.props.language} error={this.state.executingRequestError}/>;
         }
 
         if (!this.props.accessToken) {
-            return <Loading message={this.tt('initializing')}/>;
+            return <Loading language={this.props.language} message={this.tt('initializing')}/>;
         }
 
         if (!this.state.selectedUser && !this.props.user) {
