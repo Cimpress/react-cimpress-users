@@ -183,7 +183,7 @@ class UsersTable extends React.Component {
                 this.setState({editUser: undefined, isAddingUser: undefined});
             }}
             onConfirm={(user, changes, isAdmin) => {
-                this.setState({editUser: undefined}, () => this.onAddOrEditUser(user, changes, isAdmin));
+                this.setState({editUser: undefined, isAddingUser: undefined}, () => this.onAddOrEditUser(user, changes, isAdmin));
             }}/>;
     }
 

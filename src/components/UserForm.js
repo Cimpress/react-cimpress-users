@@ -102,7 +102,7 @@ class UserForm extends React.Component {
         return [
             <div key={0} className='row'>
                 <div className='col-sm-12'>
-                    <TextField label={this.tt('search_for_users')} value={this.state.searchKey} onChange={(v) => {
+                    <TextField autoFocus label={this.tt('search_for_users')} value={this.state.searchKey} onChange={(v) => {
                         this.setState({searchKey: v.target.value}, () => this.debouncedSearch());
                     }}/>
                 </div>

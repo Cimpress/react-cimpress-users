@@ -17,18 +17,23 @@ class UserRow extends React.Component {
         return t(key, {lng: language});
     }
 
-    renderRoles() {
+    renderRoles(isCurrentUser) {
         let filteredRoles = this.props.allowedRoles.filter((a) => this.props.user.roles.find((x) => x === a.roleName));
+
+        let readOnly =this.props.readOnly || isCurrentUser;
 
         let editIcon = <Icon
             name={'pencil-circle-l'} size={'2x'}
-            color={this.props.readOnly ? colors.platinum : colors.shale}/>;
+            color={readOnly ? colors.platinum : colors.shale}/>;
 
         let deleteIcon = <Icon
             name={'remove-circle-1-l'} size={'2x'}
-            color={this.props.readOnly ? colors.platinum : colors.shale}/>;
+            color={readOnly ? colors.platinum : colors.shale}/>;
 
-        if (this.props.readOnly) {
+        if (isCurrentUser) {
+            editIcon = <Tooltip contents={this.tt('editing_disabled_current_user')}>{editIcon}</Tooltip>;
+            deleteIcon = <Tooltip contents={this.tt('deleting_disabled_current_user')}>{deleteIcon}</Tooltip>;
+        } else if (readOnly) {
             editIcon = <Tooltip contents={this.tt('editing_disabled')}>{editIcon}</Tooltip>;
             deleteIcon = <Tooltip contents={this.tt('deleting_disabled')}>{deleteIcon}</Tooltip>;
         } else {
@@ -46,13 +51,13 @@ class UserRow extends React.Component {
                     </span>&nbsp;</span>;
                 })}
             &nbsp;
-            <span className={`rcu-icon ${this.props.readOnly ? 'rcu-icon-disabled' : ''}`}
-                onClick={this.props.readOnly ? null : () => this.props.onEditRolesClick()}>
+            <span className={`rcu-icon ${readOnly ? 'rcu-icon disabled' : ''}`}
+                onClick={readOnly ? null : () => this.props.onEditRolesClick()}>
                 {editIcon}
             </span>
             &nbsp;&nbsp;
-            <span className={`rcu-icon ${this.props.readOnly ? 'rcu-icon-disabled' : ''}`}
-                onClick={this.props.readOnly ? null : () => this.setState({confirmDelete: true})}>
+            <span className={`rcu-icon ${readOnly ? 'rcu-icon disabled' : ''}`}
+                onClick={readOnly ? null : () => this.setState({confirmDelete: true})}>
                 {deleteIcon}
             </span>
         </span>;
@@ -78,13 +83,19 @@ class UserRow extends React.Component {
         </tr>;
     }
 
-    renderUserName() {
+    renderUserName(isCurrentUser) {
+        let meLabel = isCurrentUser
+            ? <Tooltip contents={this.tt('this_is_you_tooltip')}>
+                <Icon name={'rank-army-star-2-f'} size={'1x'} color={colors.info.base}/>
+            </Tooltip>
+            : null;
+
         if (this.props.user.profile.name === this.props.user.profile.email) {
-            return this.props.user.profile.name;
+            return <Fragment>{this.props.user.profile.name} {meLabel}</Fragment>;
         }
 
         return <Fragment>{this.props.user.profile.name} <span
-            className={'text-muted'}>(<em>{this.props.user.profile.email}</em>)</span>
+            className={'text-muted'}>(<em>{this.props.user.profile.email}</em>) {meLabel}</span>
         </Fragment>;
     }
 
@@ -105,12 +116,12 @@ class UserRow extends React.Component {
                                 <Icon name={'person-1-l'} className='user-icon-member'/>
                             </Tooltip>}
                         &nbsp;
-                        {this.renderUserName()}
+                        {this.renderUserName(this.props.user.principal === this.props.currentUserSub)}
                     </div>
                 </div>
                 <div className={'row'}>
                     <div className={'col-sm-12'} align='right'>
-                        {this.renderRoles(this.props.user)}
+                        {this.renderRoles(this.props.user.principal === this.props.currentUserSub)}
                     </div>
                 </div>
             </td>
@@ -128,6 +139,8 @@ UserRow.propTypes = {
 
     // display
     language: PropTypes.string,
+
+    currentUserSub: PropTypes.bool,
 
     user: PropTypes.object.isRequired,
 
