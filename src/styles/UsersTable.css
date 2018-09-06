@@ -1,23 +1,3 @@
-.fa-action-button {
-    background-color: white;
-    color: gray;
-    padding-left: 5px;
-}
-
-.fa-action-button:hover {
-    color: #800;
-    cursor: pointer;
-}
-
-.badge-danger .fa-action-button {
-    background: none;
-    color: white;
-}
-
-.badge-danger .fa-action-button:hover {
-    color: #fee;
-}
-
 .rcu-icon .ij-icon.ij-icon-2x, .rcu-info-icon .ij-icon.ij-icon-2x {
     width: 24px;
     height: 24px;
@@ -29,12 +9,16 @@
     padding-top: 0px;
 }
 
-
 .rcu-icon .ij-icon.ij-icon-2x embed, .rcu-icon .ij-icon.ij-icon-2x svg, .rcu-info-icon .ij-icon.ij-icon-2x svg {
     transform: scale(calc(24 / 24));
 }
 
 .rcu-icon.disabled .ij-icon.ij-icon-2x embed, .rcu-icon.disabled .ij-icon.ij-icon-2x svg {
+    fill: #e1e6eb !important;
+    cursor: default;
+}
+
+.rcu-icon.disabled .ij-icon.ij-icon-2x embed:hover, .rcu-icon.disabled .ij-icon.ij-icon-2x svg:hover {
     fill: #e1e6eb !important;
     cursor: default;
 }
@@ -70,8 +54,16 @@
     color: rgb(105, 117, 130);
 }
 
+.user-icon-member svg {
+    fill: rgb(105, 117, 130);
+}
+
 .user-icon-admin {
     color: rgb(214, 54, 37);
+}
+
+.user-icon-admin svg {
+    fill: rgb(214, 54, 37);
 }
 
 .rcu-checkbox-list {
@@ -111,4 +103,11 @@
 .rcu-checkbox-row:hover {
     background-color: #edf3f9;
     cursor: pointer;
+}
+
+.rcu-header {
+    margin-bottom: 5px;
+}
+
+.rcu-component {
 }

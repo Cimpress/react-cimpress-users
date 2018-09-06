@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
 
 import {getI18nInstance} from '../i18n';
@@ -17,18 +17,23 @@ class UserRow extends React.Component {
         return t(key, {lng: language});
     }
 
-    renderRoles() {
+    renderRoles(isCurrentUser) {
         let filteredRoles = this.props.allowedRoles.filter((a) => this.props.user.roles.find((x) => x === a.roleName));
 
+        let readOnly =this.props.readOnly || isCurrentUser;
+
         let editIcon = <Icon
-            name={'pencil-circle-f'} size={'2x'}
-            color={this.props.readOnly ? colors.platinum : colors.shale}/>;
+            name={'pencil-circle-l'} size={'2x'}
+            color={readOnly ? colors.platinum : colors.shale}/>;
 
         let deleteIcon = <Icon
-            name={'remove-circle-1-f'} size={'2x'}
-            color={this.props.readOnly ? colors.platinum : colors.shale}/>;
+            name={'remove-circle-1-l'} size={'2x'}
+            color={readOnly ? colors.platinum : colors.shale}/>;
 
-        if (this.props.readOnly) {
+        if (isCurrentUser) {
+            editIcon = <Tooltip contents={this.tt('editing_disabled_current_user')}>{editIcon}</Tooltip>;
+            deleteIcon = <Tooltip contents={this.tt('deleting_disabled_current_user')}>{deleteIcon}</Tooltip>;
+        } else if (readOnly) {
             editIcon = <Tooltip contents={this.tt('editing_disabled')}>{editIcon}</Tooltip>;
             deleteIcon = <Tooltip contents={this.tt('deleting_disabled')}>{deleteIcon}</Tooltip>;
         } else {
@@ -46,13 +51,13 @@ class UserRow extends React.Component {
                     </span>&nbsp;</span>;
                 })}
             &nbsp;
-            <span className={`rcu-icon ${this.props.readOnly ? 'rcu-icon-disabled' : ''}`}
-                onClick={this.props.readOnly ? null : () => this.props.onEditRolesClick()}>
+            <span className={`rcu-icon ${readOnly ? 'rcu-icon disabled' : ''}`}
+                onClick={readOnly ? null : () => this.props.onEditRolesClick()}>
                 {editIcon}
             </span>
             &nbsp;&nbsp;
-            <span className={`rcu-icon ${this.props.readOnly ? 'rcu-icon-disabled' : ''}`}
-                onClick={this.props.readOnly ? null : () => this.setState({confirmDelete: true})}>
+            <span className={`rcu-icon ${readOnly ? 'rcu-icon disabled' : ''}`}
+                onClick={readOnly ? null : () => this.setState({confirmDelete: true})}>
                 {deleteIcon}
             </span>
         </span>;
@@ -78,6 +83,22 @@ class UserRow extends React.Component {
         </tr>;
     }
 
+    renderUserName(isCurrentUser) {
+        let meLabel = isCurrentUser
+            ? <Tooltip contents={this.tt('this_is_you_tooltip')}>
+                <Icon name={'rank-army-star-2-f'} color={colors.info.base}/>
+            </Tooltip>
+            : null;
+
+        if (this.props.user.profile.name === this.props.user.profile.email) {
+            return <Fragment>{this.props.user.profile.name} {meLabel}</Fragment>;
+        }
+
+        return <Fragment>{this.props.user.profile.name} <span
+            className={'text-muted'}>(<em>{this.props.user.profile.email}</em>) {meLabel}</span>
+        </Fragment>;
+    }
+
     render() {
         if (this.state.confirmDelete) {
             return this.renderConfirmDelete();
@@ -86,16 +107,21 @@ class UserRow extends React.Component {
         return <tr>
             <td style={{paddingRight: '10px', paddingLeft: '10px'}}>
                 <div className={'row'}>
-                    <div className={'col-sm-4'}>
+                    <div className={'col-sm-12'}>
                         {this.props.user.is_admin
-                            ? <Tooltip contents={this.tt('group_administrator')}><i className={'fa fa-user-plus user-icon-admin'}/></Tooltip>
-                            : <Tooltip contents={this.tt('group_member')}><i className={'fa fa-user user-icon-member'}/></Tooltip>}
+                            ? <Tooltip contents={this.tt('group_administrator')}>
+                                <Icon name={'person-1-l'} className='user-icon-admin'/>
+                            </Tooltip>
+                            : <Tooltip contents={this.tt('group_member')}>
+                                <Icon name={'person-1-l'} className='user-icon-member'/>
+                            </Tooltip>}
                         &nbsp;
-                        {this.props.user.profile.name} <span
-                            className={'text-muted'}>(<em>{this.props.user.profile.email}</em>)</span>
+                        {this.renderUserName(this.props.user.principal === this.props.currentUserSub)}
                     </div>
-                    <div className={'col-sm-8'} align='right'>
-                        {this.renderRoles(this.props.user)}
+                </div>
+                <div className={'row'}>
+                    <div className={'col-sm-12'} align='right'>
+                        {this.renderRoles(this.props.user.principal === this.props.currentUserSub)}
                     </div>
                 </div>
             </td>
@@ -113,6 +139,8 @@ UserRow.propTypes = {
 
     // display
     language: PropTypes.string,
+
+    currentUserSub: PropTypes.string,
 
     user: PropTypes.object.isRequired,
 

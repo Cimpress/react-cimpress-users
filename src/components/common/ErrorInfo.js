@@ -1,14 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {colors, Icon} from '@cimpress/react-components';
+import {translate} from 'react-i18next';
+import {getI18nInstance} from '../../i18n';
+
+function tt(props, key) {
+    let {t, language} = props;
+    return t(key, {lng: language});
+}
 
 let ErrorInfo = (props) => {
     return <div className={'card'}>
         <div className={'card-block'}>
-            <div>
-                <strong>
-                    <Icon name={'report-problem-triangle-l'} color={colors.persimmon.base}/>&nbsp;{props.error.message}
-                </strong>
+            <div style={{display: 'flex'}}>
+                <div style={{marginRight: '10px'}}>
+                    <Icon name={'report-problem-triangle-l'} size={'2x'} color={colors.persimmon.base}/>&nbsp;
+                </div>
+                <div>
+                    {props.error.message}
+                </div>
             </div>
             <br/>
             <div>
@@ -16,8 +26,8 @@ let ErrorInfo = (props) => {
             </div>
             {props.onAcknowledgeClick
                 ? <div align="right">
-                    <button className={'btn btn-sm btn-outline-secondary'} onClick={() => props.onAcknowledgeClick()}>
-                        OK
+                    <button className={'btn btn-outline-secondary'} onClick={() => props.onAcknowledgeClick()}>
+                        {tt(props, 'button_ok')}
                     </button>
                 </div>
                 : null}
@@ -30,4 +40,4 @@ ErrorInfo.propTypes = {
     onAcknowledgeClick: PropTypes.func,
 };
 
-export default ErrorInfo;
+export default translate('translations', {i18n: getI18nInstance()})(ErrorInfo);

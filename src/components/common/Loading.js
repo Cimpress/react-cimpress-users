@@ -17,6 +17,7 @@ let Loading = (props) => {
 };
 
 Loading.propTypes = {
+    language: PropTypes.string,
     message: PropTypes.any,
 };
 

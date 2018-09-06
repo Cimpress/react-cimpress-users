@@ -102,7 +102,7 @@ class UserForm extends React.Component {
         return [
             <div key={0} className='row'>
                 <div className='col-sm-12'>
-                    <TextField label={this.tt('search_for_users')} value={this.state.searchKey} onChange={(v) => {
+                    <TextField autoFocus label={this.tt('search_for_users')} value={this.state.searchKey} onChange={(v) => {
                         this.setState({searchKey: v.target.value}, () => this.debouncedSearch());
                     }}/>
                 </div>
@@ -111,7 +111,7 @@ class UserForm extends React.Component {
                 <div className='col-sm-12'>
                     <div>
                         {this.state.isExecutingRequest
-                            ? <Loading/>
+                            ? <Loading language={this.props.language}/>
                             : <table className='table table-hover'>
                                 <tbody>
                                     {this.state.foundPrincipals && this.state.foundPrincipals.length === 0
@@ -187,15 +187,22 @@ class UserForm extends React.Component {
 
     render() {
         if (this.state.executingRequestError) {
-            return <ErrorInfo error={this.state.executingRequestError}/>;
+            return <ErrorInfo language={this.props.language} error={this.state.executingRequestError}/>;
         }
 
         if (!this.props.accessToken) {
-            return <Loading message={this.tt('initializing')}/>;
+            return <Loading language={this.props.language} message={this.tt('initializing')}/>;
         }
 
         if (!this.state.selectedUser && !this.props.user) {
-            return this.renderSearch();
+            return <div>
+                {this.renderSearch()}
+                <div align='right'>
+                    <button className={'btn btn-default'} onClick={() => this.props.onCancel()}>
+                        {this.tt('button_cancel')}
+                    </button>
+                </div>
+            </div>;
         }
 
         let user = this.state.selectedUser || this.props.user;

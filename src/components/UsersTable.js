@@ -9,14 +9,14 @@ import {
     getGroupInfo,
     patchUserRoles,
     addGroupMember,
+    searchPrincipals,
     deleteGroupMember,
 } from '../apis/coam.api';
 
-import {TabCard, Checkbox, Icon, colors} from '@cimpress/react-components';
+import {Tooltip, Checkbox, Icon, colors} from '@cimpress/react-components';
 
 import '../styles/UsersTable.css';
 import UserRow from './UserRow';
-import GroupInfo from './GroupInfo';
 import Loading from './common/Loading';
 import ErrorInfo from './common/ErrorInfo';
 import UserForm from './UserForm';
@@ -37,6 +37,7 @@ class UsersTable extends React.Component {
 
         this.state = {
             showAdmins: this.props.showAdminsOnly,
+            addUserEnabled: true,
             editUserRolesModalOpen: false,
             editUser: undefined,
         };
@@ -66,18 +67,41 @@ class UsersTable extends React.Component {
                 this.setState(state);
             })
             .catch((error) => {
-                this.setState({
-                    isExecutingRequest: false,
-                    executingRequestError: error,
-                });
+                if (error.response && error.response.status === 403) {
+                    this.setState({
+                        isExecutingRequest: false,
+                        executingRequestError: {
+                            message: 'Not enough permission to assign the selected roles. You can only assign roles that are already assigned to you.',
+                        },
+                    });
+                } else {
+                    this.setState({
+                        isExecutingRequest: false,
+                        executingRequestError: error,
+                    });
+                }
             });
     }
 
     fetchGroupInfo() {
-        return this.executeRequest(
-            getGroupInfo(this.props.accessToken, this.props.groupId),
-            this.tt('loading_group_information'),
-            'groupInfo');
+        return Promise.all([
+            this.executeRequest(
+                getGroupInfo(this.props.accessToken, this.props.groupId),
+                this.tt('loading_group_information'),
+                'groupInfo'),
+            this.checkIfSearchingForUsersWouldWork()]);
+    }
+
+    checkIfSearchingForUsersWouldWork() {
+        searchPrincipals(this.props.accessToken, 'dummy')
+            .then(() => {
+                this.setState({addUserEnabled: true});
+            })
+            .catch((e) => {
+                if (e.response && e.response.status === 403) {
+                    this.setState({addUserEnabled: false});
+                }
+            });
     }
 
 
@@ -151,96 +175,134 @@ class UsersTable extends React.Component {
 
     renderUserForm(user) {
         return <UserForm
+            language={this.props.language}
             accessToken={this.props.accessToken}
             allowedRoles={this.props.allowedRoles}
             mutuallyExclusiveRoles={this.props.mutuallyExclusiveRoles}
             user={user}
             onCancel={() => {
-                this.setState({editUser: undefined});
+                this.setState({editUser: undefined, isAddingUser: undefined});
             }}
             onConfirm={(user, changes, isAdmin) => {
-                this.setState({editUser: undefined}, () => this.onAddOrEditUser(user, changes, isAdmin));
+                this.setState({editUser: undefined, isAddingUser: undefined}, () => this.onAddOrEditUser(user, changes, isAdmin));
             }}/>;
+    }
+
+    renderUsers() {
+        return this.state.editUser
+            ? this.renderUserForm(this.state.editUser)
+            : <div>
+                {this.props.showAdminsOnlyFilter
+                    ? <div>
+                        <Checkbox
+                            style={{marginTop: '0px'}}
+                            label={this.tt('view_admins_only')} checked={this.state.showAdmins}
+                            onChange={() => this.setState({showAdmins: !this.state.showAdmins})}/>
+                    </div>
+                    : null}
+                <table className='table table-hover'>
+                    <tbody>
+                        {this.state.groupInfo.members.length == 0
+                            ? <em>{this.tt('no-users')}</em>
+                            : null}
+                        {this.state.groupInfo.members
+                            .sort((a, b) => a.profile.name.localeCompare(b.profile.name))
+                            .filter((a) => !this.state.showAdmins || a.is_admin)
+                            .map((m, i) => {
+                                let canModify = !this.props.readOnly && this.currentUserIsAdmin();
+                                return <UserRow
+                                    language={this.props.language}
+                                    key={i}
+                                    user={m}
+                                    currentUserSub={this.currentUserSub}
+                                    allowedRoles={this.props.allowedRoles}
+                                    readOnly={!canModify}
+                                    onDeleteUserClick={!canModify ? null : () => this.onDeleteUser(m)}
+                                    onEditRolesClick={!canModify ? null : () => this.setState({
+                                        editUser: m,
+                                    })}
+                                />;
+                            })}
+                    </tbody>
+                </table>
+            </div>;
+    }
+
+    renderHeader() {
+        let caption = this.tt('header-title-users');
+        if (this.state.isAddingUser) {
+            caption = this.tt('header-title-add-user');
+        }
+        if (this.state.editUser) {
+            caption = this.tt('header-title-edit-user');
+        }
+
+        let addButton = <Icon name={'add-circle-1'} size={'2x'} color={this.props.readOnly ? colors.platinum : colors.shale} />;
+
+        return <div className={'rcu-header'}>
+            <div className={'row'}>
+                <div className={'col-xs-8'}>
+                    <h5>{caption}
+                        &nbsp;
+                        {!this.state.isAddingUser && !this.state.editUser
+                            ? (this.state.addUserEnabled && this.currentUserIsAdmin() ?
+                                <Tooltip contents={this.tt('tab_add_user_caption')}>
+                                    <span onClick={() => this.setState({isAddingUser: true})} className={'rcu-icon'}>
+                                        {addButton}
+                                    </span>
+                                </Tooltip>
+                                : <Tooltip contents={this.tt('tab_add_user_caption_disabled')}>
+                                    <span className={'rcu-icon disabled'}>
+                                        {addButton}
+                                    </span>
+                                </Tooltip>)
+                            : null}
+                    </h5>
+                </div>
+                <div className={'col-xs-4'}>
+                    <h5 style={{textAlign: 'right'}}>
+                        {!this.state.isAddingUser && !this.state.editUser
+                            ? <span onClick={() => this.fetchGroupInfo()} className={'rcu-icon'}>
+                                <Tooltip contents={this.tt('refresh-button-tooltip')}>
+                                    <Icon name={'synchronize-3-l'} size={'2x'}
+                                        color={this.props.readOnly ? colors.platinum : colors.shale}/>
+                                </Tooltip>
+                            </span>
+                            : null}
+                    </h5>
+                </div>
+            </div>
+        </div>;
     }
 
     render() {
         if (this.state.isExecutingRequest) {
-            return <Loading message={this.executingRequestCaption}/>;
+            return <Loading language={this.props.language} message={this.executingRequestCaption}/>;
         }
 
         if (this.state.executingRequestError) {
-            return <ErrorInfo error={this.state.executingRequestError}
+            return <ErrorInfo
+                language={this.props.language}
+                error={this.state.executingRequestError}
                 onAcknowledgeClick={() => this.setState({executingRequestError: undefined})}/>;
         }
 
         if (!this.props.accessToken || !this.state.groupInfo) {
-            return <Loading message={this.tt('initializing')}/>;
+            return <Loading language={this.props.language} message={this.tt('initializing')}/>;
         }
 
-        let tabs = [{
-            name: 'Users',
-            block: this.state.editUser
-                ? this.renderUserForm(this.state.editUser)
-                : <div>
-                    <div className={'row'}>
-                        <div className={'col-xs-6'} align="left">
-                            <Checkbox
-                                style={{marginTop: '0px'}}
-                                label={this.tt('view_admins_only')} checked={this.state.showAdmins}
-                                onChange={() => this.setState({showAdmins: !this.state.showAdmins})}/>
-                        </div>
-                        <div className={'col-xs-6'} align="right">
-                            <span onClick={() => this.fetchGroupInfo()} className={'rcu-icon'}>
-                                <Icon name={'synchronize-3-l'} size={'2x'}
-                                    color={this.props.readOnly ? colors.platinum : colors.shale}/>
-                            </span>
-                        </div>
-                    </div>
-                    <table className='table table-hover'>
-                        <tbody>
-                            {this.state.groupInfo.members.length == 0
-                                ? <em>No users</em>
-                                : null}
-                            {this.state.groupInfo.members
-                                .sort((a, b) => a.profile.name.localeCompare(b.profile.name))
-                                .filter((a) => !this.state.showAdmins || a.is_admin)
-                                .map((m, i) => {
-                                    let canModify = !this.props.readOnly && this.currentUserIsAdmin();
-                                    return <UserRow key={i}
-                                        user={m}
-                                        currentUserSub={this.currentUserSub}
-                                        allowedRoles={this.props.allowedRoles}
-                                        readOnly={!canModify}
-                                        onDeleteUserClick={!canModify ? null : () => this.onDeleteUser(m)}
-                                        onEditRolesClick={!canModify ? null : () => this.setState({
-                                            editUser: m,
-                                        })}
-                                    />;
-                                })}
-                        </tbody>
-                    </table>
-                </div>,
-            href: '#',
-        }];
-
-        if (this.props.showGroupInfo) {
-            tabs.push({
-                name: this.tt('tab_group_info_caption'),
-                block: <GroupInfo groupInfo={this.state.groupInfo}/>,
-                href: '#',
-            });
+        let content = this.renderUsers();
+        if (this.state.isAddingUser) {
+            content = this.renderUserForm();
         }
-
-        tabs.push({
-            name: this.tt('tab_add_user_caption'),
-            block: this.renderUserForm(),
-            href: '#',
-        });
 
         return (
-            <div className='row'>
-                <div className='col-sm-12'>
-                    <TabCard tabs={tabs} selectedIndex={0}/>
+            <div className={'rcu-component'}>
+                <div className='row'>
+                    <div className='col-sm-12'>
+                        {this.renderHeader()}
+                        {content}
+                    </div>
                 </div>
             </div>
         );
@@ -260,10 +322,11 @@ UsersTable.propTypes = {
     mutuallyExclusiveRoles: PropTypes.bool,
 
     groupId: PropTypes.number,
-    showGroupInfo: PropTypes.bool,
 
     readOnly: PropTypes.bool,
     showAdminsOnly: PropTypes.bool,
+    showAdminsOnlyFilter: PropTypes.bool,
+    showCoamLink: PropTypes.bool,
 };
 
 UsersTable.defaultProps = {
@@ -271,7 +334,8 @@ UsersTable.defaultProps = {
     readOnly: false,
     mutuallyExclusiveRoles: false,
     showAdminsOnly: false,
-    showGroupInfo: false,
+    showAdminsOnlyFilter: true,
+    showCoamLink: true,
 };
 
 export default translate('translations', {i18n: getI18nInstance()})(UsersTable);
