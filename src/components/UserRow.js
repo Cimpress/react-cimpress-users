@@ -104,8 +104,6 @@ class UserRow extends React.Component {
             return this.renderConfirmDelete();
         }
 
-        console.log(this.props)
-
         return <tr>
             <td style={{paddingRight: '10px', paddingLeft: '10px'}}>
                 <div className={'row'}>
