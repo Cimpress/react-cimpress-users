@@ -32,6 +32,7 @@ function getI18nInstance() {
 
                 saveMissing: true,
                 missingKeyHandler: (lng, ns, key, fallbackValue) => {
+                    // eslint-disable-next-line no-console
                     console.log(lng, ns, key, fallbackValue);
                 },
             });
