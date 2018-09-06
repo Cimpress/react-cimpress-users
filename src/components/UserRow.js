@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
 
 import {getI18nInstance} from '../i18n';
@@ -21,11 +21,11 @@ class UserRow extends React.Component {
         let filteredRoles = this.props.allowedRoles.filter((a) => this.props.user.roles.find((x) => x === a.roleName));
 
         let editIcon = <Icon
-            name={'pencil-circle-f'} size={'2x'}
+            name={'pencil-circle-l'} size={'2x'}
             color={this.props.readOnly ? colors.platinum : colors.shale}/>;
 
         let deleteIcon = <Icon
-            name={'remove-circle-1-f'} size={'2x'}
+            name={'remove-circle-1-l'} size={'2x'}
             color={this.props.readOnly ? colors.platinum : colors.shale}/>;
 
         if (this.props.readOnly) {
@@ -78,6 +78,16 @@ class UserRow extends React.Component {
         </tr>;
     }
 
+    renderUserName() {
+        if (this.props.user.profile.name === this.props.user.profile.email) {
+            return this.props.user.profile.name;
+        }
+
+        return <Fragment>{this.props.user.profile.name} <span
+            className={'text-muted'}>(<em>{this.props.user.profile.email}</em>)</span>
+        </Fragment>;
+    }
+
     render() {
         if (this.state.confirmDelete) {
             return this.renderConfirmDelete();
@@ -86,15 +96,20 @@ class UserRow extends React.Component {
         return <tr>
             <td style={{paddingRight: '10px', paddingLeft: '10px'}}>
                 <div className={'row'}>
-                    <div className={'col-sm-4'}>
+                    <div className={'col-sm-12'}>
                         {this.props.user.is_admin
-                            ? <Tooltip contents={this.tt('group_administrator')}><i className={'fa fa-user-plus user-icon-admin'}/></Tooltip>
-                            : <Tooltip contents={this.tt('group_member')}><i className={'fa fa-user user-icon-member'}/></Tooltip>}
+                            ? <Tooltip contents={this.tt('group_administrator')}>
+                                <Icon name={'person-1-l'} className='user-icon-admin'/>
+                            </Tooltip>
+                            : <Tooltip contents={this.tt('group_member')}>
+                                <Icon name={'person-1-l'} className='user-icon-member'/>
+                            </Tooltip>}
                         &nbsp;
-                        {this.props.user.profile.name} <span
-                            className={'text-muted'}>(<em>{this.props.user.profile.email}</em>)</span>
+                        {this.renderUserName()}
                     </div>
-                    <div className={'col-sm-8'} align='right'>
+                </div>
+                <div className={'row'}>
+                    <div className={'col-sm-12'} align='right'>
                         {this.renderRoles(this.props.user)}
                     </div>
                 </div>

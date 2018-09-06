@@ -195,7 +195,14 @@ class UserForm extends React.Component {
         }
 
         if (!this.state.selectedUser && !this.props.user) {
-            return this.renderSearch();
+            return <div>
+                {this.renderSearch()}
+                <div align='right'>
+                    <button className={'btn btn-default'} onClick={() => this.props.onCancel()}>
+                        {this.tt('button_cancel')}
+                    </button>
+                </div>
+            </div>;
         }
 
         let user = this.state.selectedUser || this.props.user;

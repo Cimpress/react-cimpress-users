@@ -25,6 +25,7 @@ stories.add('Basic use', () => <Authenticated><UsersTable
     groupId={number('Group ID', 5223)}
     allowedRoles={object('Allowed Roles', roles)}
     showAdminsOnly={boolean('Admins only', false)}
+    showAdminsOnlyFilter={boolean('Admins filter', false)}
     showGroupInfo={boolean('Group Info', false)}
     mutuallyExclusiveRoles={boolean('Mutually Exclusive Roles', false)}
 /></Authenticated>);
@@ -33,6 +34,7 @@ stories.add('Mutually exclusive roles', () => <Authenticated><UsersTable
     groupId={number('Group ID', 5223)}
     allowedRoles={object('Allowed Roles', roles)}
     showAdminsOnly={boolean('Admins only', false)}
+    showAdminsOnlyFilter={boolean('Admins filter', false)}
     showGroupInfo={boolean('Group Info', false)}
     mutuallyExclusiveRoles={boolean('Mutually Exclusive Roles', true)}
 /></Authenticated>);
@@ -41,14 +43,8 @@ stories.add('Show admins only', () => <Authenticated><UsersTable
     groupId={number('Group ID', 5223)}
     allowedRoles={object('Allowed Roles', roles)}
     showAdminsOnly={boolean('Admins only', true)}
+    showAdminsOnlyFilter={boolean('Admins filter', true)}
     showGroupInfo={boolean('Group Info', false)}
-/></Authenticated>);
-
-stories.add('With group info', () => <Authenticated><UsersTable
-    groupId={number('Group ID', 5223)}
-    allowedRoles={object('Allowed Roles', roles)}
-    showAdminsOnly={boolean('Admins only', false)}
-    showGroupInfo={boolean('Group Info', true)}
 /></Authenticated>);
 
 stories.add('In a drawer', () => <Authenticated>

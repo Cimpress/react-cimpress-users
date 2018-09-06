@@ -5,10 +5,13 @@ import {colors, Icon} from '@cimpress/react-components';
 let ErrorInfo = (props) => {
     return <div className={'card'}>
         <div className={'card-block'}>
-            <div>
-                <strong>
-                    <Icon name={'report-problem-triangle-l'} color={colors.persimmon.base}/>&nbsp;{props.error.message}
-                </strong>
+            <div style={{display:'flex'}}>
+                <div style={{marginRight:'10px'}}>
+                    <Icon name={'report-problem-triangle-l'} size={'2x'} color={colors.persimmon.base}/>&nbsp;
+                </div>
+                <div>
+                    {props.error.message}
+                </div>
             </div>
             <br/>
             <div>
@@ -16,7 +19,7 @@ let ErrorInfo = (props) => {
             </div>
             {props.onAcknowledgeClick
                 ? <div align="right">
-                    <button className={'btn btn-sm btn-outline-secondary'} onClick={() => props.onAcknowledgeClick()}>
+                    <button className={'btn btn-outline-secondary'} onClick={() => props.onAcknowledgeClick()}>
                         OK
                     </button>
                 </div>

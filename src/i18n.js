@@ -29,6 +29,11 @@ function getI18nInstance() {
                 react: {
                     wait: true,
                 },
+
+                saveMissing: true,
+                missingKeyHandler: (lng, ns, key, fallbackValue) => {
+                    console.log(lng, ns, key, fallbackValue);
+                },
             });
     }
 
