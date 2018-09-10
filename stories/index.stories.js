@@ -4,7 +4,7 @@ import {storiesOf} from '@storybook/react';
 import Authenticated from './Authenticated';
 import {Drawer} from '@cimpress/react-components';
 import UsersTable from '../src/components/UsersTable';
-import {withKnobs, object, boolean, number} from '@storybook/addon-knobs/react';
+import {withKnobs, object, boolean, number, select} from '@storybook/addon-knobs/react';
 
 import auth from './auth';
 
@@ -21,7 +21,10 @@ let roles = [{
     isManagerRole: false,
 }];
 
+let langs = ['pol', 'eng', 'bul', 'spa', 'deu', 'fra'];
+
 stories.add('Basic use', () => <Authenticated><UsersTable
+    language={select('Language', langs, 'bul')}
     groupId={number('Group ID', 5223)}
     allowedRoles={object('Allowed Roles', roles)}
     showAdminsOnly={boolean('Admins only', false)}
@@ -30,6 +33,7 @@ stories.add('Basic use', () => <Authenticated><UsersTable
 /></Authenticated>);
 
 stories.add('Mutually exclusive roles', () => <Authenticated><UsersTable
+    language={select('Language', langs, 'bul')}
     groupId={number('Group ID', 5223)}
     allowedRoles={object('Allowed Roles', roles)}
     showAdminsOnly={boolean('Admins only', false)}
@@ -38,6 +42,7 @@ stories.add('Mutually exclusive roles', () => <Authenticated><UsersTable
 /></Authenticated>);
 
 stories.add('Show admins only', () => <Authenticated><UsersTable
+    language={select('Language', langs, 'bul')}
     groupId={number('Group ID', 5223)}
     allowedRoles={object('Allowed Roles', roles)}
     showAdminsOnly={boolean('Admins only', true)}
@@ -50,6 +55,7 @@ stories.add('In a drawer', () => <Authenticated>
         header="The drawer header"
         footer={<div>The drawer footer</div>}>
         <UsersTable
+            language={select('Language', langs, 'bul')}
             accessToken={auth.getAccessToken()}
             groupId={number('Group ID', 5223)}
             allowedRoles={object('Allowed Roles', roles)}

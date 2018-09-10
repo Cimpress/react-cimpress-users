@@ -64,10 +64,13 @@ class UserRow extends React.Component {
     }
 
     renderConfirmDelete() {
+        let profile = this.props.user.profile || {};
+        let userIdentifier = profile.name || profile.email || this.props.user.principal;
+
         return <tr>
             <td style={{paddingRight: '10px', paddingLeft: '10px', backgroundColor: '#fee'}}>
                 <div className={'clearfix'}>
-                    <h5>Remove {this.props.user.profile.name}?</h5>
+                    <h5>{this.tt('remove_user_are_you_sure')}<br/>{userIdentifier}</h5>
                     <div className={'pull-right'} align="right">
                         <button className={'btn btn-sm btn-default'}
                             onClick={() => this.setState({confirmDelete: false})}>
@@ -84,19 +87,25 @@ class UserRow extends React.Component {
     }
 
     renderUserName(isCurrentUser) {
+        let profile = this.props.user.profile || {};
+
         let meLabel = isCurrentUser
-            ? <Tooltip contents={this.tt('this_is_you_tooltip')}>
+            ? <Tooltip contents={this.tt('this_is_you_tooltip')} className={'rcu-principal-tooltip'}>
                 <Icon name={'rank-army-star-2-f'} color={colors.info.base}/>
             </Tooltip>
             : null;
 
-        if (this.props.user.profile.name === this.props.user.profile.email) {
-            return <Fragment>{this.props.user.profile.name} {meLabel}</Fragment>;
+        if (profile.name === profile.email && profile.name) {
+            return <Fragment>{profile.name} {meLabel}</Fragment>;
         }
 
-        return <Fragment>{this.props.user.profile.name} <span
-            className={'text-muted'}>(<em>{this.props.user.profile.email}</em>) {meLabel}</span>
-        </Fragment>;
+        if (!profile.name && !profile.email) {
+            return <Fragment>{this.props.user.principal}</Fragment>;
+        }
+
+        return <Tooltip contents={this.props.user.principal} className={'rcu-principal-tooltip'}>{profile.name} <span
+            className={'text-muted'}>(<em>{profile.email}</em>) {meLabel}</span>
+        </Tooltip>;
     }
 
     render() {
