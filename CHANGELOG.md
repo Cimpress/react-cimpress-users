@@ -4,7 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [0.2.0] -
+## [0.2.1]
+### Fixed
+- Fixed a bug causing incorrect behavior with client accounts
+- Added missing translation keys
+
+## [0.2.0]
 ### Removed
 - Removed the support for group information
  
@@ -12,7 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - A new, clearer look and feel
 - Better error handling
 
-## [0.1.2] -
+## [0.1.2]
 ### Added
 - Added development guide and storybook integration
 - Added new story for UsersTable in a Drawer

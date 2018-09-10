@@ -48,7 +48,7 @@ class UsersTable extends React.Component {
         return t(key, {lng: language});
     }
 
-    executeRequest(promise, caption, stateVar) {
+    executeRequest(promise, caption, stateVar, preformatData=undefined) {
         this.setState({
             isExecutingRequest: true,
             executingRequestError: undefined,
@@ -62,7 +62,7 @@ class UsersTable extends React.Component {
                     executingRequestError: undefined,
                 };
                 if (stateVar) {
-                    state[stateVar] = response;
+                    state[stateVar] = preformatData ? preformatData(response) : response;
                 }
                 this.setState(state);
             })
@@ -71,7 +71,7 @@ class UsersTable extends React.Component {
                     this.setState({
                         isExecutingRequest: false,
                         executingRequestError: {
-                            message: 'Not enough permission to assign the selected roles. You can only assign roles that are already assigned to you.',
+                            message: this.tt('error_not_enough_access_rights'),
                         },
                     });
                 } else {
@@ -83,12 +83,31 @@ class UsersTable extends React.Component {
             });
     }
 
+    sortMembers(groupInfo) {
+        const members = groupInfo.members.sort((a, b) => {
+            if (a.profile && b.profile) {
+                return a.profile.name.localeCompare(b.profile.name);
+            }
+            if (a.profile) {
+                return -1;
+            }
+            if (b.profile) {
+                return 1;
+            }
+            return a.principal.localeCompare(b.principal);
+        });
+
+        groupInfo.members = members;
+
+        return groupInfo;
+    }
+
     fetchGroupInfo() {
         return Promise.all([
             this.executeRequest(
                 getGroupInfo(this.props.accessToken, this.props.groupId),
                 this.tt('loading_group_information'),
-                'groupInfo'),
+                'groupInfo', this.sortMembers),
             this.checkIfSearchingForUsersWouldWork()]);
     }
 
@@ -206,7 +225,6 @@ class UsersTable extends React.Component {
                             ? <em>{this.tt('no-users')}</em>
                             : null}
                         {this.state.groupInfo.members
-                            .sort((a, b) => a.profile.name.localeCompare(b.profile.name))
                             .filter((a) => !this.state.showAdmins || a.is_admin)
                             .map((m, i) => {
                                 let canModify = !this.props.readOnly && this.currentUserIsAdmin();
