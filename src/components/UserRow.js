@@ -95,17 +95,18 @@ class UserRow extends React.Component {
             </Tooltip>
             : null;
 
+        let connectionIcon = <Tooltip contents={`${this.tt('auth0_connection')} ${profile.connection || (((profile.identities||{})[0]||{}).connection)}`} className={'rcu-principal-tooltip'}><Icon name={'plug-2-l'} /></Tooltip>;
+
         if (profile.name === profile.email && profile.name) {
-            return <Fragment>{profile.name} {meLabel}</Fragment>;
+            return <Fragment>{profile.name} {connectionIcon} {meLabel}</Fragment>;
         }
 
         if (!profile.name && !profile.email) {
             return <Fragment>{this.props.user.principal}</Fragment>;
         }
 
-        return <Tooltip contents={this.props.user.principal} className={'rcu-principal-tooltip'}>{profile.name} <span
-            className={'text-muted'}>(<em>{profile.email}</em>) {meLabel}</span>
-        </Tooltip>;
+        return <Fragment>{profile.name} <span className={'text-muted'}>(<em>{profile.email}</em>) {connectionIcon} {meLabel}</span>
+        </Fragment>;
     }
 
     render() {
