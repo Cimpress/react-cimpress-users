@@ -1,10 +1,11 @@
-import React, {Fragment} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 import {getI18nInstance} from '../i18n';
 import {translate} from 'react-i18next';
 
 import {Tooltip, Icon, colors} from '@cimpress/react-components';
+import UserLine from './UserLine';
 
 class UserRow extends React.Component {
     constructor(props) {
@@ -86,29 +87,6 @@ class UserRow extends React.Component {
         </tr>;
     }
 
-    renderUserName(isCurrentUser) {
-        let profile = this.props.user.profile || {};
-
-        let meLabel = isCurrentUser
-            ? <Tooltip contents={this.tt('this_is_you_tooltip')} className={'rcu-principal-tooltip'}>
-                <Icon name={'rank-army-star-2-f'} color={colors.info.base}/>
-            </Tooltip>
-            : null;
-
-        let connectionIcon = <Tooltip contents={`${this.tt('auth0_connection')} ${profile.connection || (((profile.identities||{})[0]||{}).connection)}`} className={'rcu-principal-tooltip'}><Icon name={'plug-2-l'} /></Tooltip>;
-
-        if (profile.name === profile.email && profile.name) {
-            return <Fragment>{profile.name} {connectionIcon} {meLabel}</Fragment>;
-        }
-
-        if (!profile.name && !profile.email) {
-            return <Fragment>{this.props.user.principal}</Fragment>;
-        }
-
-        return <Fragment>{profile.name} <span className={'text-muted'}>(<em>{profile.email}</em>) {connectionIcon} {meLabel}</span>
-        </Fragment>;
-    }
-
     render() {
         if (this.state.confirmDelete) {
             return this.renderConfirmDelete();
@@ -126,7 +104,11 @@ class UserRow extends React.Component {
                                 <Icon name={'person-1-l'} className='user-icon-member'/>
                             </Tooltip>}
                         &nbsp;
-                        {this.renderUserName(this.props.user.principal === this.props.currentUserSub)}
+                        <UserLine
+                            language={this.props.language}
+                            user={this.props.user}
+                            withAvatar
+                            isCurrentUser={this.props.user.principal === this.props.currentUserSub}/>
                     </div>
                 </div>
                 <div className={'row'}>

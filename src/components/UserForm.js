@@ -8,11 +8,11 @@ import {searchPrincipals} from '../apis/coam.api';
 
 import {TextField, Tooltip, Checkbox, Icon, RadioGroup, Radio} from '@cimpress/react-components';
 
-import '../styles/UsersTable.css';
 import Loading from './common/Loading';
 import ErrorInfo from './common/ErrorInfo';
 
 import debounce from 'debounce';
+import UserLine from './UserLine';
 
 class UserForm extends React.Component {
     constructor(props) {
@@ -83,17 +83,9 @@ class UserForm extends React.Component {
     }
 
     renderUserRow(user, onClick) {
-        let u = user;
-        if (user.profile) {
-            u = user.profile;
-        }
-
         return <tr>
             <td className={'rcu-user-row'} onClick={onClick}>
-                <img src={u.picture} alt="" className={'rcu-user-avatar'}/>
-                {u.name}
-                {' '}
-                <span className={'text-muted'}><em>({u.email})</em></span>
+                <UserLine language={this.props.language} user={user} withAvatar/>
             </td>
         </tr>;
     }
@@ -102,9 +94,10 @@ class UserForm extends React.Component {
         return [
             <div key={0} className='row'>
                 <div className='col-sm-12'>
-                    <TextField autoFocus label={this.tt('search_for_users')} value={this.state.searchKey} onChange={(v) => {
-                        this.setState({searchKey: v.target.value}, () => this.debouncedSearch());
-                    }}/>
+                    <TextField autoFocus label={this.tt('search_for_users')} value={this.state.searchKey}
+                        onChange={(v) => {
+                            this.setState({searchKey: v.target.value}, () => this.debouncedSearch());
+                        }}/>
                 </div>
             </div>,
             <div key={1} className='row'>
@@ -118,7 +111,7 @@ class UserForm extends React.Component {
                                         ? <tr>
                                             <td>{this.tt('no_users_found')}</td>
                                         </tr>
-                                        : (this.state.foundPrincipals || []).map((p) => this.renderUserRow(p, () => this.setState({selectedUser: p})))}
+                                        : (this.state.foundPrincipals || []).map((p) => this.renderUserRow(p.profile ? p.profile : p, () => this.setState({selectedUser: p})))}
                                 </tbody>
                             </table>}
                     </div>
@@ -187,7 +180,13 @@ class UserForm extends React.Component {
 
     render() {
         if (this.state.executingRequestError) {
-            return <ErrorInfo language={this.props.language} error={this.state.executingRequestError}/>;
+            return <ErrorInfo
+                language={this.props.language} error={this.state.executingRequestError}
+                onAcknowledgeClick={() => {
+                    this.setState({
+                        executingRequestError: undefined,
+                    });
+                }}/>;
         }
 
         if (!this.props.accessToken) {
