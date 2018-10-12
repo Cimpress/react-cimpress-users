@@ -1,6 +1,6 @@
 {
   "name": "react-cimpress-users",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "A simple user management component based on COAM",
   "main": "./lib/index.js",
   "scripts": {
@@ -8,7 +8,8 @@
     "storybook": "start-storybook -p 3000",
     "build-storybook": "build-storybook",
     "code-check": "eslint --ext .js --ext .jsx src",
-    "build": "node node_modules/grunt-cli/bin/grunt webpack && babel src -d lib --copy-files"
+    "translate": "cimpress-translations-cli -a 8a76a642-dd82-41d0-887f-604ff91901c9 -c ${CLIENT_ID} -s ${CLIENT_SECRET} -t ./src/locales/translations.json",
+    "compile": "babel src -d lib --copy-files"
   },
   "files": [
     "lib"
@@ -29,8 +30,11 @@
     "@cimpress/react-components": "^3.0.0 || ^4.0.0"
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.0.0-beta.55",
-    "@babel/preset-react": "^7.0.0-beta.55",
+    "@babel/cli": "^7.1.2",
+    "@babel/core": "^7.1.2",
+    "@babel/plugin-transform-runtime": "^7.1.0",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/preset-react": "^7.0.0",
     "@cimpress/react-components": "^5.2.5",
     "@storybook/addon-actions": "^4.0.0-alpha.16",
     "@storybook/addon-console": "^1.0.4",
@@ -42,23 +46,13 @@
     "@storybook/react": "^4.0.0-alpha.16",
     "auth0-sso-login": "^3.0.115",
     "aws-sdk": "^2.286.2",
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.3",
     "babel-loader": "^7.1.5",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-react": "^6.24.1",
-    "babel-runtime": "^6.26.0",
-    "cimpress-translations": "^2.1.4",
-    "cimpress-translations-webpack-plugin": "^1.1.10",
+    "cimpress-translations-cli": "^0.1.4",
     "css-loader": "^1.0.0",
     "eslint": "^5.2.0",
     "eslint-config-google": "^0.9.1",
     "eslint-plugin-react": "^7.11.0",
-    "grunt": "^1.0.3",
-    "grunt-cli": "^1.2.0",
-    "grunt-webpack": "^3.1.2",
     "jwt-decode": "^2.2.0",
-    "load-grunt-tasks": "^4.0.0",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
     "react-virtualized-select": "^3.1.3",
