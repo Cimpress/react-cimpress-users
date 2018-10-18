@@ -46,7 +46,7 @@
     "@storybook/react": "^4.0.0-alpha.16",
     "auth0-sso-login": "^3.0.115",
     "aws-sdk": "^2.286.2",
-    "babel-loader": "^7.1.5",
+    "babel-loader": "^8.0.4",
     "cimpress-translations-cli": "^0.1.4",
     "css-loader": "^1.0.0",
     "eslint": "^5.2.0",
