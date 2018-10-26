@@ -12,41 +12,48 @@ class UserLine extends React.Component {
 
     render() {
         let u = this.props.user || {};
-        let profile = u.profile || u;
+        let profile = u.profile || (u.profiles ? u.profiles[0] : undefined) || u;
 
-        let avatar = this.props.withAvatar && u.picture
-            ? <img src={u.picture} alt="" className={'rcu-user-avatar'}/>
+        let avatar = this.props.withAvatar && (u.picture||profile.picture)
+            ? <img src={u.picture||profile.picture} alt="" className={'rcu-user-avatar'}/>
+            : null;
+
+        let adminLabel = this.props.withUserType
+            ? (u.is_admin
+                ? <Tooltip contents={this.tt('group_administrator')}>
+                &nbsp;
+                    <Icon name={'person-1-l'} className='user-icon-admin'/>
+                </Tooltip>
+                : <Tooltip contents={this.tt('group_member')}>
+                &nbsp;
+                    <Icon name={'person-1-l'} className='user-icon-member'/>
+                </Tooltip>)
             : null;
 
         let meLabel = this.props.isCurrentUser
             ? <Tooltip contents={this.tt('this_is_you_tooltip')} className={'rcu-principal-tooltip'}>
+                &nbsp;
                 <Icon name={'rank-army-star-2-f'} color={colors.info.base}/>
             </Tooltip>
             : null;
-
-        let connection = profile.connection || (((profile.identities||{})[0]||{}).connection);
-        let connectionIcon = ! connection ? null
-            : <Tooltip contents={`${this.tt('auth0_connection')} ${connection}`} className={'rcu-principal-tooltip'}>
-                <Icon name={'plug-2-l'} />
-            </Tooltip>;
 
         let mutedEmail = profile.email
             ? <span className={'text-muted'}>(<em>{profile.email}</em>)</span>
             : null;
 
         if (profile.name === profile.email && profile.name) {
-            return <Fragment>{profile.name} {connectionIcon} {meLabel}</Fragment>;
+            return <Fragment>{profile.name} {meLabel}</Fragment>;
         }
 
         if (!profile.name && !profile.email) {
-            return <Fragment>{u.principal || u.user_id} {connectionIcon}</Fragment>;
+            return <Fragment>{u.principal || u.user_id}</Fragment>;
         }
 
         return <Fragment>
             {avatar}{' '}
             {profile.name}{' '}
             {mutedEmail}{' '}
-            {connectionIcon}{' '}
+            {adminLabel}
             {meLabel}
         </Fragment>;
     }
@@ -57,6 +64,7 @@ UserLine.propTypes = {
     language: PropTypes.string,
 
     withAvatar: PropTypes.bool,
+    withUserType: PropTypes.bool,
     user: PropTypes.object,
     isCurrentUser: PropTypes.bool,
 };

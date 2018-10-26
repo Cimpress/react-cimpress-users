@@ -26,7 +26,7 @@ const exec = (data) => {
 
 const getGroupInfo = (accessToken, groupId) => {
     let data = defaultRequestData(accessToken, {
-        url: `/v1/groups/${groupId}?${Math.random() * 1000000}`,
+        url: `/v1/groups/${groupId}?canonicalize=true&${Math.random() * 1000000}`,
         method: 'GET',
     });
 
@@ -122,15 +122,17 @@ const searchPrincipals = (accessToken, query) => {
     }
 
     let data = defaultRequestData(accessToken, {
-        url: '/v1/principals',
+        url: '/v1/search/canonicalPrincipals/bySubstring',
         method: 'GET',
         params: {
             q: query,
+            canonicalize: true,
+            m: Math.random() * 1000000,
         },
     });
 
     // [{user_id / name / email}]
-    return exec(data).then((p) => p.principals);
+    return exec(data).then((p) => p.canonical_principals);
 };
 
 export {

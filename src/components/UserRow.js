@@ -87,6 +87,10 @@ class UserRow extends React.Component {
         </tr>;
     }
 
+    isCurrentUser() {
+
+    }
+
     render() {
         if (this.state.confirmDelete) {
             return this.renderConfirmDelete();
@@ -96,24 +100,17 @@ class UserRow extends React.Component {
             <td style={{paddingRight: '10px', paddingLeft: '10px'}}>
                 <div className={'row'}>
                     <div className={'col-sm-12'}>
-                        {this.props.user.is_admin
-                            ? <Tooltip contents={this.tt('group_administrator')}>
-                                <Icon name={'person-1-l'} className='user-icon-admin'/>
-                            </Tooltip>
-                            : <Tooltip contents={this.tt('group_member')}>
-                                <Icon name={'person-1-l'} className='user-icon-member'/>
-                            </Tooltip>}
-                        &nbsp;
                         <UserLine
                             language={this.props.language}
                             user={this.props.user}
                             withAvatar
-                            isCurrentUser={this.props.user.principal === this.props.currentUserSub}/>
+                            withUserType
+                            isCurrentUser={this.props.isCurrentUser}/>
                     </div>
                 </div>
                 <div className={'row'}>
                     <div className={'col-sm-12'} align='right'>
-                        {this.renderRoles(this.props.user.principal === this.props.currentUserSub)}
+                        {this.renderRoles(this.props.isCurrentUser)}
                     </div>
                 </div>
             </td>
@@ -135,6 +132,8 @@ UserRow.propTypes = {
     currentUserSub: PropTypes.string,
 
     user: PropTypes.object.isRequired,
+
+    isCurrentUser: PropTypes.bool.isRequired,
 
     onEditRolesClick: PropTypes.func.isRequired,
     onDeleteUserClick: PropTypes.func.isRequired,
