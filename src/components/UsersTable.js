@@ -11,6 +11,7 @@ import {
     addGroupMember,
     searchPrincipals,
     deleteGroupMember,
+    group56,
 } from '../apis/coam.api';
 
 import {Tooltip, Checkbox, Icon, colors} from '@cimpress/react-components';
@@ -108,7 +109,18 @@ class UsersTable extends React.Component {
                 getGroupInfo(this.props.accessToken, this.props.groupId),
                 this.tt('loading_group_information'),
                 'groupInfo', this.sortMembers),
-            this.checkIfSearchingForUsersWouldWork()]);
+            this.checkIfSearchingForUsersWouldWork(),
+            this.checkIfGroup56()]);
+    }
+
+    checkIfGroup56() {
+        group56(this.props.accessToken, this.currentUserSub)
+            .then((g56) => {
+                this.setState({g56: g56});
+            })
+            .catch((e) => {
+                this.setState({g56: false});
+            });
     }
 
     checkIfSearchingForUsersWouldWork() {
@@ -142,8 +154,8 @@ class UsersTable extends React.Component {
             return;
         }
 
-        this.fetchGroupInfo();
         this.currentUserSub = getSubFromJWT(this.props.accessToken);
+        this.fetchGroupInfo();
     }
 
     onDeleteUser(user) {
@@ -241,6 +253,10 @@ class UsersTable extends React.Component {
             allowedRoles={this.props.allowedRoles}
             mutuallyExclusiveRoles={this.props.mutuallyExclusiveRoles}
             user={user}
+            showAvatar={this.props.showAvatar}
+            showEmail={this.props.showEmail}
+            showEmailAsTooltip={this.props.showEmailAsTooltip}
+            showName={this.props.showName}
             onCancel={() => {
                 this.setState({editUser: undefined, isAddingUser: undefined});
             }}
@@ -274,6 +290,10 @@ class UsersTable extends React.Component {
                                     language={this.props.language}
                                     key={i}
                                     user={m}
+                                    showAvatar={this.props.showAvatar}
+                                    showEmail={this.props.showEmail}
+                                    showEmailAsTooltip={this.props.showEmailAsTooltip}
+                                    showName={this.props.showName}
                                     isCurrentUser={this.isCurrentUser(m)}
                                     currentUserSub={this.currentUserSub}
                                     allowedRoles={this.props.allowedRoles}
@@ -306,7 +326,7 @@ class UsersTable extends React.Component {
                     <h5>{caption}
                         &nbsp;
                         {!this.state.isAddingUser && !this.state.editUser
-                            ? (this.state.addUserEnabled && this.currentUserIsAdmin() ?
+                            ? (((this.state.addUserEnabled && this.currentUserIsAdmin()) || this.state.g56) ?
                                 <Tooltip contents={this.tt('tab_add_user_caption')}>
                                     <span onClick={() => this.setState({isAddingUser: true})} className={'rcu-icon'}>
                                         {addButton}
@@ -386,6 +406,10 @@ UsersTable.propTypes = {
 
     readOnly: PropTypes.bool,
     showAdminsOnly: PropTypes.bool,
+    showAvatar: PropTypes.bool,
+    showEmail: PropTypes.bool,
+    showEmailAsTooltip: PropTypes.bool,
+    showName: PropTypes.bool,
     showAdminsOnlyFilter: PropTypes.bool,
     showCoamLink: PropTypes.bool,
 };
@@ -396,7 +420,10 @@ UsersTable.defaultProps = {
     mutuallyExclusiveRoles: false,
     showAdminsOnly: false,
     showAdminsOnlyFilter: true,
-    showCoamLink: true,
+    showAvatar: true,
+    showEmail: true,
+    showEmailAsTooltip: true,
+    showName: true,
 };
 
 export default translate('translations', {i18n: getI18nInstance()})(UsersTable);

@@ -37,22 +37,42 @@ class UserLine extends React.Component {
             </Tooltip>
             : null;
 
-        let mutedEmail = profile.email
-            ? <span className={'text-muted'}>(<em>{profile.email}</em>)</span>
-            : null;
-
-        if (profile.name === profile.email && profile.name) {
-            return <Fragment>{profile.name} {meLabel}</Fragment>;
+        let email = profile.email;
+        if (!this.props.withEmail) {
+            email = null;
         }
 
-        if (!profile.name && !profile.email) {
-            return <Fragment>{u.principal || u.user_id}</Fragment>;
+        let mutedEmail = email
+            ? this.props.withName
+                ? <span className={'text-muted'}>{' '}(<em>{email}</em>){' '}</span>
+                : email
+            : null;
+
+        let name = profile.name;
+        if (this.props.withEmail && this.props.withEmailAsTooltip) {
+            mutedEmail = null;
+            name = <Tooltip contents={profile.email || '---'}>
+                {name}
+            </Tooltip>;
+        }
+
+
+        if (!this.props.withName || !profile.name) {
+            name = null;
+        }
+
+        if (profile.name === profile.email && name) {
+            return <Fragment>{name} {meLabel}</Fragment>;
+        }
+
+        if ((!name && !email)||(!profile.name && !profile.email)) {
+            return <Fragment>{avatar} {u.principal || u.canonical_principal || u.user_id}{adminLabel}{meLabel}</Fragment>;
         }
 
         return <Fragment>
             {avatar}{' '}
-            {profile.name}{' '}
-            {mutedEmail}{' '}
+            {name}
+            {mutedEmail}
             {adminLabel}
             {meLabel}
         </Fragment>;
@@ -65,6 +85,9 @@ UserLine.propTypes = {
 
     withAvatar: PropTypes.bool,
     withUserType: PropTypes.bool,
+    withEmail: PropTypes.bool,
+    withName: PropTypes.bool,
+    withEmailAsTooltip: PropTypes.bool,
     user: PropTypes.object,
     isCurrentUser: PropTypes.bool,
 };

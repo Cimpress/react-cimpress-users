@@ -99,8 +99,11 @@ class UserRow extends React.Component {
                         <UserLine
                             language={this.props.language}
                             user={this.props.user}
-                            withAvatar
+                            withAvatar={this.props.showAvatar}
                             withUserType
+                            withEmail={this.props.showEmail}
+                            withEmailAsTooltip={this.props.showEmailAsTooltip}
+                            withName={this.props.showName}
                             isCurrentUser={this.props.isCurrentUser}/>
                     </div>
                 </div>
@@ -135,6 +138,11 @@ UserRow.propTypes = {
     onDeleteUserClick: PropTypes.func.isRequired,
 
     readOnly: PropTypes.bool,
+
+    showAvatar: PropTypes.bool,
+    showEmail: PropTypes.bool,
+    showEmailAsTooltip: PropTypes.bool,
+    showName: PropTypes.bool,
 };
 
 UserRow.defaultProps = {
