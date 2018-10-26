@@ -176,7 +176,7 @@ class UsersTable extends React.Component {
     onAddOrEditUser(user, rolesChanges, isAdmin) {
         let sub = user.principal || user.user_id;
         if (!sub) {
-            sub = user.profiles ? user.profiles[0].user_id : null;
+            sub = (Array.isArray(user.profiles) && user.profiles.length>0) ? user.profiles[0].user_id : null;
         }
         const newGroupInfo = merge(this.state.groupInfo, {});
 
