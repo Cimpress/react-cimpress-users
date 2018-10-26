@@ -85,7 +85,7 @@ class UserForm extends React.Component {
     renderUserRow(user, onClick) {
         return <tr>
             <td className={'rcu-user-row'} onClick={onClick}>
-                <UserLine language={this.props.language} user={user} withAvatar/>
+                <UserLine language={this.props.language} withUserType={false} user={user} withAvatar/>
             </td>
         </tr>;
     }

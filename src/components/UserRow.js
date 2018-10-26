@@ -18,10 +18,10 @@ class UserRow extends React.Component {
         return t(key, {lng: language});
     }
 
-    renderRoles(isCurrentUser) {
+    renderRoles() {
         let filteredRoles = this.props.allowedRoles.filter((a) => this.props.user.roles.find((x) => x === a.roleName));
 
-        let readOnly =this.props.readOnly || isCurrentUser;
+        let readOnly =this.props.readOnly || this.props.isCurrentUser;
 
         let editIcon = <Icon
             name={'pencil-circle-l'} size={'2x'}
@@ -31,7 +31,7 @@ class UserRow extends React.Component {
             name={'remove-circle-1-l'} size={'2x'}
             color={readOnly ? colors.platinum : colors.shale}/>;
 
-        if (isCurrentUser) {
+        if (this.props.isCurrentUser) {
             editIcon = <Tooltip contents={this.tt('editing_disabled_current_user')}>{editIcon}</Tooltip>;
             deleteIcon = <Tooltip contents={this.tt('deleting_disabled_current_user')}>{deleteIcon}</Tooltip>;
         } else if (readOnly) {
@@ -96,24 +96,17 @@ class UserRow extends React.Component {
             <td style={{paddingRight: '10px', paddingLeft: '10px'}}>
                 <div className={'row'}>
                     <div className={'col-sm-12'}>
-                        {this.props.user.is_admin
-                            ? <Tooltip contents={this.tt('group_administrator')}>
-                                <Icon name={'person-1-l'} className='user-icon-admin'/>
-                            </Tooltip>
-                            : <Tooltip contents={this.tt('group_member')}>
-                                <Icon name={'person-1-l'} className='user-icon-member'/>
-                            </Tooltip>}
-                        &nbsp;
                         <UserLine
                             language={this.props.language}
                             user={this.props.user}
                             withAvatar
-                            isCurrentUser={this.props.user.principal === this.props.currentUserSub}/>
+                            withUserType
+                            isCurrentUser={this.props.isCurrentUser}/>
                     </div>
                 </div>
                 <div className={'row'}>
                     <div className={'col-sm-12'} align='right'>
-                        {this.renderRoles(this.props.user.principal === this.props.currentUserSub)}
+                        {this.renderRoles()}
                     </div>
                 </div>
             </td>
@@ -135,6 +128,8 @@ UserRow.propTypes = {
     currentUserSub: PropTypes.string,
 
     user: PropTypes.object.isRequired,
+
+    isCurrentUser: PropTypes.bool.isRequired,
 
     onEditRolesClick: PropTypes.func.isRequired,
     onDeleteUserClick: PropTypes.func.isRequired,

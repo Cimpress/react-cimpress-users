@@ -160,36 +160,78 @@ class UsersTable extends React.Component {
         );
     }
 
+    getMemberBySub(members, sub) {
+        let m = members.find((nm) => nm.principal === sub);
+        if (!m) {
+            members.forEach((nm) => {
+                let p = (nm.profiles ||[]).find((a) => a.user_id === sub);
+                if (p) {
+                    m = nm;
+                }
+            });
+        }
+        return m;
+    }
+
     onAddOrEditUser(user, rolesChanges, isAdmin) {
         let sub = user.principal || user.user_id;
+        if (!sub) {
+            sub = (Array.isArray(user.profiles) && user.profiles.length>0) ? user.profiles[0].user_id : null;
+        }
         const newGroupInfo = merge(this.state.groupInfo, {});
 
         this.executeRequest(
             addGroupMember(this.props.accessToken, this.props.groupId, sub, isAdmin)
                 .then((newData) => {
-                    const newMember = newData.members.find((nm) => nm.principal === sub);
-                    if (!newGroupInfo.members.find((existingUser) => existingUser.principal === sub)) {
-                        newGroupInfo.members.push(Object.assign({}, newMember, {profile: user}));
+                    const newMember = this.getMemberBySub(newData.members, sub);
+                    if (!this.getMemberBySub(newGroupInfo.members, sub)) {
+                        newGroupInfo.members.push(newMember);
                     }
                     return Promise.resolve();
                 })
                 .then(() => patchUserRoles(this.props.accessToken, this.props.groupId, sub, rolesChanges))
                 .then((newData) => {
-                    const newMember = newGroupInfo.members.find((x) => x.principal === sub);
+                    const newMember = this.getMemberBySub(newGroupInfo.members, sub);
                     newMember.roles = newData.roles;
                     newMember.is_admin = isAdmin;
+                    newMember.profiles = user.profiles || (user.profile ? [user.profile] : undefined) || user;
                     this.setState({groupInfo: newGroupInfo});
                 }),
             this.tt('adding_or_modifying_user')
         );
     }
 
-    currentUserIsAdmin() {
+    currentUserMember() {
         if (!this.state.groupInfo) {
             return false;
         }
+
         let member = this.state.groupInfo.members.find((x) => x.principal === this.currentUserSub);
+        if (!member) {
+            this.state.groupInfo.members.forEach((m) =>{
+                let matchingProfile = (m.profiles||[]).find((p) => p.user_id === this.currentUserSub);
+                if (matchingProfile) {
+                    member = m;
+                }
+            });
+        }
+
+        return member;
+    }
+
+    currentUserIsAdmin() {
+        const member = this.currentUserMember();
         return member && member.is_admin === true;
+    }
+
+    isCurrentUser(m) {
+        if (m.principal === this.currentUserSub) {
+            return true;
+        }
+
+        let p = (m.profiles ? m.profiles : []).find((p) => p.user_id === this.currentUserSub);
+
+        return !!p;
     }
 
     renderUserForm(user) {
@@ -232,6 +274,7 @@ class UsersTable extends React.Component {
                                     language={this.props.language}
                                     key={i}
                                     user={m}
+                                    isCurrentUser={this.isCurrentUser(m)}
                                     currentUserSub={this.currentUserSub}
                                     allowedRoles={this.props.allowedRoles}
                                     readOnly={!canModify}
