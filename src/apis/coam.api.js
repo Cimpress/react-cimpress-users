@@ -76,7 +76,7 @@ const group56 = (accessToken, principal) => {
         method: 'GET',
     });
 
-    return exec(data).then((data) => !!data.groups.find((a) => a.id === 56));
+    return exec(data).then((data) => !!data.groups.find((a) => a.id === "56"));
 };
 
 const patchUserRoles = (accessToken, groupId, principal, rolesChanges) => {
