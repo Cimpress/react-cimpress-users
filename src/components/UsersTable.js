@@ -194,7 +194,7 @@ class UsersTable extends React.Component {
                     const newMember = this.getMemberBySub(newGroupInfo.members, sub);
                     newMember.roles = newData.roles;
                     newMember.is_admin = isAdmin;
-                    newMember.profiles = user.profiles || (user.profile ? f[user.profile] : undefined) || user;
+                    newMember.profiles = user.profiles || (user.profile ? [user.profile] : undefined) || user;
                     this.setState({groupInfo: newGroupInfo});
                 }),
             this.tt('adding_or_modifying_user')
