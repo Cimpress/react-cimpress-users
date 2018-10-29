@@ -70,6 +70,15 @@ const addUserRole = (accessToken, groupId, principal, role) => {
     return exec(data);
 };
 
+const group56 = (accessToken, principal) => {
+    let data = defaultRequestData(accessToken, {
+        url: `/v1/principals/${encodeURIComponent(principal)}/groups?${Math.random() * 1000000}`,
+        method: 'GET',
+    });
+
+    return exec(data).then((data) => !!data.groups.find((a) => a.id === '56'));
+};
+
 const patchUserRoles = (accessToken, groupId, principal, rolesChanges) => {
     let data = defaultRequestData(accessToken, {
         url: `/v1/groups/${groupId}/members/${encodeURIComponent(principal)}/roles`,
@@ -142,6 +151,7 @@ export {
     addUserRole,
     removeUserRole,
     getRoles,
+    group56,
     searchPrincipals,
     //
     addGroupMember,

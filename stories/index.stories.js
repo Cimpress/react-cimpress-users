@@ -29,6 +29,10 @@ stories.add('Basic use', () => <Authenticated><UsersTable
     allowedRoles={object('Allowed Roles', roles)}
     showAdminsOnly={boolean('Admins only', false)}
     showAdminsOnlyFilter={boolean('Admins filter', false)}
+    showAvatar={boolean('Show avatar', true)}
+    showEmail={boolean('Show email', true)}
+    showEmailAsTooltip={boolean('Show email as tooltip', true)}
+    showName={boolean('Show name', true)}
     mutuallyExclusiveRoles={boolean('Mutually Exclusive Roles', false)}
 /></Authenticated>);
 
@@ -38,6 +42,10 @@ stories.add('Mutually exclusive roles', () => <Authenticated><UsersTable
     allowedRoles={object('Allowed Roles', roles)}
     showAdminsOnly={boolean('Admins only', false)}
     showAdminsOnlyFilter={boolean('Admins filter', false)}
+    showAvatar={boolean('Show avatar', true)}
+    showEmail={boolean('Show email', true)}
+    showEmailAsTooltip={boolean('Show email as tooltip', true)}
+    showName={boolean('Show name', true)}
     mutuallyExclusiveRoles={boolean('Mutually Exclusive Roles', true)}
 /></Authenticated>);
 
@@ -47,6 +55,10 @@ stories.add('Show admins only', () => <Authenticated><UsersTable
     allowedRoles={object('Allowed Roles', roles)}
     showAdminsOnly={boolean('Admins only', true)}
     showAdminsOnlyFilter={boolean('Admins filter', true)}
+    showAvatar={boolean('Show avatar', true)}
+    showEmail={boolean('Show email', true)}
+    showEmailAsTooltip={boolean('Show email as tooltip', true)}
+    showName={boolean('Show name', true)}
 /></Authenticated>);
 
 stories.add('In a drawer', () => <Authenticated>

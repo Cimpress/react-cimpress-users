@@ -37,15 +37,20 @@ Add to your code
         />
         
 The component requires:
-- **accessToken** - to make sure it can communicate with COAM
-- **groupId** - the identifier of the group that will be managed
-- **allowedRoles** - a list of roles definition that should be managed by the component. 
+- **`accessToken`** - to make sure it can communicate with COAM
+- **`groupId`** - the identifier of the group that will be managed
+- **`allowedRoles`** - a list of roles definition that should be managed by the component. 
 The idea behind this list is to provide very targeted experience suitable only for the 
 application where the component is integrated with. In majority of cases, users need to have
-only a few roles assigned to be able to use the application. Each role has **roleName** (required) that 
-will be used to pass to COAM, **roleCaption** (optional) that would be used within the UI and 
-**isManagerRole** (optional) that will be used to color the role differently.
-
+only a few roles assigned to be able to use the application. Each role has **`roleName`** (required) that 
+will be used to pass to COAM, **`roleCaption`** (optional) that would be used within the UI and 
+**`isManagerRole`** (optional, default false) that will be used to color the role differently.
+- **`showAdminsOnly`** - (optional, default false) Show only administrators users. 
+- **`showAdminsOnlyFilter`** - (optional, default true) Show a filter (checkbox) for listing only users with administrative access
+- **`showEmail`** - (optional, default true) Show user email address.
+- **`showEmailAsTooltip`** - (optional, default true) Show user email (based on `showEmail`) as a tooltip instead of inline.
+- **`showName`** - (optional, default true) Show user name
+- **`showAvatar`** - (optional, default true) Show user's avatar image (if exists).
 ## Development
 
 1. Clone the repository

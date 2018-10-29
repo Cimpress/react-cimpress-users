@@ -85,7 +85,13 @@ class UserForm extends React.Component {
     renderUserRow(user, onClick) {
         return <tr>
             <td className={'rcu-user-row'} onClick={onClick}>
-                <UserLine language={this.props.language} withUserType={false} user={user} withAvatar/>
+                <UserLine language={this.props.language}
+                    withUserType={false}
+                    user={user}
+                    withAvatar={this.props.showAvatar}
+                    withEmail={this.props.showEmail}
+                    withName={this.props.showName}
+                />
             </td>
         </tr>;
     }
@@ -261,7 +267,9 @@ UserForm.propTypes = {
     language: PropTypes.string,
 
     user: PropTypes.object,
-
+    showAvatar: PropTypes.bool,
+    showEmail: PropTypes.bool,
+    showName: PropTypes.bool,
     accessToken: PropTypes.string,
 
     // roles to allow to assign to
