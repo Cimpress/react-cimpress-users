@@ -236,7 +236,7 @@ class UserForm extends React.Component {
                     <div className={'pull-right'}>
                         <Tooltip contents={this.tt('group_administrator_context_help')}>
                             <span className={'rcu-info-icon'}>
-                                <Icon name={'infomation-circle-l'} size={'2x'}/>
+                                <Icon name={'infomation-circle-l'} size={'lg'}/>
                             </span>
                         </Tooltip>
                     </div>

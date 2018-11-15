@@ -285,7 +285,7 @@ class UsersTable extends React.Component {
                         {this.state.groupInfo.members
                             .filter((a) => !this.state.showAdmins || a.is_admin)
                             .map((m, i) => {
-                                let canModify = !this.props.readOnly && this.currentUserIsAdmin();
+                                let canModify = !this.props.readOnly && (this.currentUserIsAdmin() || this.state.g56);
                                 return <UserRow
                                     language={this.props.language}
                                     key={i}
@@ -318,7 +318,7 @@ class UsersTable extends React.Component {
             caption = this.tt('header-title-edit-user');
         }
 
-        let addButton = <Icon name={'add-circle-1'} size={'2x'} color={this.props.readOnly ? colors.platinum : colors.shale} />;
+        let addButton = <Icon name={'add-circle-1'} size={'lg'} color={this.props.readOnly ? colors.platinum : colors.shale} />;
 
         return <div className={'rcu-header'}>
             <div className={'row'}>
@@ -345,7 +345,7 @@ class UsersTable extends React.Component {
                         {!this.state.isAddingUser && !this.state.editUser
                             ? <span onClick={() => this.fetchGroupInfo()} className={'rcu-icon'}>
                                 <Tooltip contents={this.tt('refresh-button-tooltip')}>
-                                    <Icon name={'synchronize-3-l'} size={'2x'}
+                                    <Icon name={'synchronize-3-l'} size={'lg'}
                                         color={this.props.readOnly ? colors.platinum : colors.shale}/>
                                 </Tooltip>
                             </span>

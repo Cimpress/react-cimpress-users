@@ -1,35 +1,24 @@
-.rcu-icon .ij-icon.ij-icon-2x, .rcu-info-icon .ij-icon.ij-icon-2x {
-    width: 24px;
-    height: 24px;
-}
-
-.rcu-icon .ij-icon.ij-icon-2x svg, .rcu-info-icon .ij-icon.ij-icon-2x svg {
-    webkit-transform: scale(calc(24 / 24));
-    -ms-transform: scale(calc(24 / 24));
-    transform: scale(calc(24 / 24));
-}
-
-.rcu-icon.disabled .ij-icon.ij-icon-2x embed, .rcu-icon.disabled .ij-icon.ij-icon-2x svg {
+.rcu-icon.disabled .ij-icon.ij-icon-lg embed, .rcu-icon.disabled .ij-icon.ij-icon-lg svg {
     fill: #e1e6eb !important;
     cursor: default;
 }
 
-.rcu-icon.disabled .ij-icon.ij-icon-2x embed:hover, .rcu-icon.disabled .ij-icon.ij-icon-2x svg:hover {
+.rcu-icon.disabled .ij-icon.ij-icon-lg embed:hover, .rcu-icon.disabled .ij-icon.ij-icon-lg svg:hover {
     fill: #e1e6eb !important;
     cursor: default;
 }
 
-.rcu-icon .ij-icon.ij-icon-2x embed:hover, .rcu-icon .ij-icon.ij-icon-2x svg:hover {
+.rcu-icon .ij-icon.ij-icon-lg embed:hover, .rcu-icon .ij-icon.ij-icon-lg svg:hover {
     fill: rgb(240, 85, 58) !important;
     cursor: pointer;
 }
 
-.rcu-icon.rcu-icon-disabled .ij-icon.ij-icon-2x embed, .rcu-icon.rcu-icon-disabled .ij-icon.ij-icon-2x svg {
+.rcu-icon.rcu-icon-disabled .ij-icon.ij-icon-lg embed, .rcu-icon.rcu-icon-disabled .ij-icon.ij-icon-lg svg {
     fill: #e1e6eb !important;
     cursor: not-allowed;
 }
 
-.rcu-icon.rcu-icon-disabled .ij-icon.ij-icon-2x embed:hover, .rcu-icon.rcu-icon-disabled .ij-icon.ij-icon-2x svg:hover {
+.rcu-icon.rcu-icon-disabled .ij-icon.ij-icon-lg embed:hover, .rcu-icon.rcu-icon-disabled .ij-icon.ij-icon-lg svg:hover {
     fill: #e1e6eb !important;
     cursor: not-allowed;
 }

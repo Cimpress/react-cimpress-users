@@ -24,11 +24,11 @@ class UserRow extends React.Component {
         let readOnly =this.props.readOnly || this.props.isCurrentUser;
 
         let editIcon = <Icon
-            name={'pencil-circle-l'} size={'2x'}
+            name={'pencil-circle-l'} size={'lg'}
             color={readOnly ? colors.platinum : colors.shale}/>;
 
         let deleteIcon = <Icon
-            name={'remove-circle-1-l'} size={'2x'}
+            name={'remove-circle-1-l'} size={'lg'}
             color={readOnly ? colors.platinum : colors.shale}/>;
 
         if (this.props.isCurrentUser) {
