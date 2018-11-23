@@ -106,7 +106,7 @@ class UsersTable extends React.Component {
     fetchGroupInfo() {
         return Promise.all([
             this.executeRequest(
-                getGroupInfo(this.props.accessToken, this.props.groupId),
+                getGroupInfo(this.props.accessToken, this.props.groupUrl),
                 this.tt('loading_group_information'),
                 'groupInfo', this.sortMembers),
             this.checkIfSearchingForUsersWouldWork(),
@@ -138,7 +138,7 @@ class UsersTable extends React.Component {
 
     componentDidUpdate(prevProps) {
         if ((prevProps.accessToken !== this.props.accessToken && this.props.accessToken) ||
-            (prevProps.groupId !== this.props.groupId && this.props.groupId)) {
+            (prevProps.groupUrl !== this.props.groupUrl && this.props.groupUrl)) {
             this.currentUserSub = getSubFromJWT(this.props.accessToken);
             this.fetchGroupInfo();
         }
@@ -163,7 +163,7 @@ class UsersTable extends React.Component {
         const newGroupInfo = merge(this.state.groupInfo, {});
 
         this.executeRequest(
-            deleteGroupMember(this.props.accessToken, this.props.groupId, sub)
+            deleteGroupMember(this.props.accessToken, this.state.groupInfo.id, sub)
                 .then((newData) => {
                     newGroupInfo.members = newGroupInfo.members.filter((x) => x.principal !== sub);
                     this.setState({groupInfo: newGroupInfo});
@@ -193,7 +193,7 @@ class UsersTable extends React.Component {
         const newGroupInfo = merge(this.state.groupInfo, {});
 
         this.executeRequest(
-            addGroupMember(this.props.accessToken, this.props.groupId, sub, isAdmin)
+            addGroupMember(this.props.accessToken, this.state.groupInfo.id, sub, isAdmin)
                 .then((newData) => {
                     const newMember = this.getMemberBySub(newData.members, sub);
                     if (!this.getMemberBySub(newGroupInfo.members, sub)) {
@@ -201,7 +201,7 @@ class UsersTable extends React.Component {
                     }
                     return Promise.resolve();
                 })
-                .then(() => patchUserRoles(this.props.accessToken, this.props.groupId, sub, rolesChanges))
+                .then(() => patchUserRoles(this.props.accessToken, this.state.groupInfo.id, sub, rolesChanges))
                 .then((newData) => {
                     const newMember = this.getMemberBySub(newGroupInfo.members, sub);
                     newMember.roles = newData.roles;
@@ -402,7 +402,7 @@ UsersTable.propTypes = {
     allowedRoles: PropTypes.array.isRequired,
     mutuallyExclusiveRoles: PropTypes.bool,
 
-    groupId: PropTypes.number,
+    groupUrl: PropTypes.string,
 
     readOnly: PropTypes.bool,
     showAdminsOnly: PropTypes.bool,
