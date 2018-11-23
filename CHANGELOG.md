@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [1.0.0] - 2018-10-29
 ### Changed
-- `groupId` property is not replaced with `groupUrl` to allow better integration with REST-aware services
+- `groupId` property is now replaced with `groupUrl` to allow better integration with REST-aware services
 
 ## [0.5.0] - 2018-10-29
 ### Fixed
