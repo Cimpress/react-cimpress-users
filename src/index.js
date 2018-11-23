@@ -1,5 +1,5 @@
-import 'regenerator-runtime/runtime';
+import "regenerator-runtime/runtime";
 
-import UsersTable from './components/UsersTable';
+import UsersTable from "./components/UsersTable";
 
-export {UsersTable};
+export { UsersTable };

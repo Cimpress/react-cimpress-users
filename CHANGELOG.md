@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2018-10-29
+### Changed
+- `groupId` property is not replaced with `groupUrl` to allow better integration with REST-aware services
+
 ## [0.5.0] - 2018-10-29
 ### Fixed
 - Tweaked icons size ('lg' instead of '2x'), removed custom sizing to improve consistency

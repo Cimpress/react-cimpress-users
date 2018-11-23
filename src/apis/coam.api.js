@@ -24,9 +24,9 @@ const exec = (data) => {
         });
 };
 
-const getGroupInfo = (accessToken, groupId) => {
+const getGroupInfo = (accessToken, groupUrl) => {
     let data = defaultRequestData(accessToken, {
-        url: `/v1/groups/${groupId}?canonicalize=true&${Math.random() * 1000000}`,
+        url: `${groupUrl}?canonicalize=true&${Math.random() * 1000000}`,
         method: 'GET',
     });
 

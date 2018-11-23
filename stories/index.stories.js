@@ -36,7 +36,10 @@ stories.add("Basic use", () => (
   <Authenticated>
     <UsersTable
       language={select("Language", langs, "bul")}
-      groupId={number("Group ID", 5898)}
+      groupUrl={number(
+        "GroupURL",
+        "https://api.cimpress.io/auth/access-management/v1/groups/5898"
+      )}
       allowedRoles={object("Allowed Roles", roles)}
       showAdminsOnly={boolean("Admins only", false)}
       showAdminsOnlyFilter={boolean("Admins filter", false)}
@@ -53,7 +56,10 @@ stories.add("Mutually exclusive roles", () => (
   <Authenticated>
     <UsersTable
       language={select("Language", langs, "bul")}
-      groupId={number("Group ID", 5898)}
+      groupUrl={number(
+        "GroupURL",
+        "https://api.cimpress.io/auth/access-management/v1/groups/5898"
+      )}
       allowedRoles={object("Allowed Roles", roles)}
       showAdminsOnly={boolean("Admins only", false)}
       showAdminsOnlyFilter={boolean("Admins filter", false)}
@@ -70,7 +76,10 @@ stories.add("Show admins only", () => (
   <Authenticated>
     <UsersTable
       language={select("Language", langs, "bul")}
-      groupId={number("Group ID", 5898)}
+      groupUrl={number(
+        "GroupURL",
+        "https://api.cimpress.io/auth/access-management/v1/groups/5898"
+      )}
       allowedRoles={object("Allowed Roles", roles)}
       showAdminsOnly={boolean("Admins only", true)}
       showAdminsOnlyFilter={boolean("Admins filter", true)}
@@ -92,7 +101,10 @@ stories.add("In a drawer", () => (
       <UsersTable
         language={select("Language", langs, "bul")}
         accessToken={auth.getAccessToken()}
-        groupId={number("Group ID", 5898)}
+        groupUrl={number(
+          "GroupURL",
+          "https://api.cimpress.io/auth/access-management/v1/groups/5898"
+        )}
         allowedRoles={object("Allowed Roles", roles)}
       />
     </Drawer>
