@@ -186,7 +186,7 @@ class UsersTable extends React.Component {
     }
 
     onAddOrEditUser(user, rolesChanges, isAdmin) {
-        let sub = user.principal || user.user_id;
+        let sub = user.principal || user.canonical_principal || user.user_id;
         if (!sub) {
             sub = (Array.isArray(user.profiles) && user.profiles.length>0) ? user.profiles[0].user_id : null;
         }
