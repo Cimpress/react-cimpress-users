@@ -91,7 +91,7 @@ const patchUserRoles = (accessToken, groupId, principal, rolesChanges) => {
 
 const addGroupMember = (accessToken, groupId, principal, isAdmin) => {
     let data = defaultRequestData(accessToken, {
-        url: `/v1/groups/${groupId}/members`,
+        url: `/v1/groups/${groupId}/members?canonicalize=true`,
         method: 'PATCH',
         data: {
             'add': [{
