@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import {getI18nInstance} from '../i18n';
 import {translate} from 'react-i18next';
 
-import {searchPrincipals} from '../apis/coam.api';
+import {findPrincipals} from 'coam-client';
 
 import {TextField, Tooltip, Checkbox, Icon, RadioGroup, Radio} from '@cimpress/react-components';
 
@@ -58,7 +58,7 @@ class UserForm extends React.Component {
 
     searchPrincipals() {
         return this.executeRequest(
-            searchPrincipals(this.props.accessToken, this.state.searchKey),
+            findPrincipals(this.props.accessToken, this.state.searchKey),
             this.tt('searching'),
             'foundPrincipals'
         );

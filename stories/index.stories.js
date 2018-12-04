@@ -10,6 +10,7 @@ import {
     boolean,
     number,
     select,
+    text,
 } from '@storybook/addon-knobs/react';
 
 import auth from './auth';
@@ -36,9 +37,9 @@ stories.add('Basic use', () => (
     <Authenticated>
         <UsersTable
             language={select('Language', langs, 'bul')}
-            groupUrl={number(
+            groupUrl={text(
                 'GroupURL',
-                'https://api.cimpress.io/auth/access-management/v1/groups/5898'
+                'https://api.cimpress.io/auth/access-management/v1/groups/5605'
             )}
             allowedRoles={object('Allowed Roles', roles)}
             showAdminsOnly={boolean('Admins only', false)}
@@ -56,9 +57,9 @@ stories.add('Mutually exclusive roles', () => (
     <Authenticated>
         <UsersTable
             language={select('Language', langs, 'bul')}
-            groupUrl={number(
+            groupUrl={text(
                 'GroupURL',
-                'https://api.cimpress.io/auth/access-management/v1/groups/5898'
+                'https://api.cimpress.io/auth/access-management/v1/groups/5605'
             )}
             allowedRoles={object('Allowed Roles', roles)}
             showAdminsOnly={boolean('Admins only', false)}
@@ -76,9 +77,9 @@ stories.add('Show admins only', () => (
     <Authenticated>
         <UsersTable
             language={select('Language', langs, 'bul')}
-            groupUrl={number(
+            groupUrl={text(
                 'GroupURL',
-                'https://api.cimpress.io/auth/access-management/v1/groups/5898'
+                'https://api.cimpress.io/auth/access-management/v1/groups/5605'
             )}
             allowedRoles={object('Allowed Roles', roles)}
             showAdminsOnly={boolean('Admins only', true)}
@@ -103,7 +104,7 @@ stories.add('In a drawer', () => (
                 accessToken={auth.getAccessToken()}
                 groupUrl={number(
                     'GroupURL',
-                    'https://api.cimpress.io/auth/access-management/v1/groups/5898'
+                    'https://api.cimpress.io/auth/access-management/v1/groups/5605'
                 )}
                 allowedRoles={object('Allowed Roles', roles)}
             />

@@ -7,12 +7,12 @@ import {translate} from 'react-i18next';
 
 import {
     getGroupInfo,
-    patchUserRoles,
+    modifyUserRoles,
     addGroupMember,
-    searchPrincipals,
-    deleteGroupMember,
+    findPrincipals,
+    removeGroupMember,
     group56,
-} from '../apis/coam.api';
+} from 'coam-client';
 
 import {Tooltip, Checkbox, Icon, colors} from '@cimpress/react-components';
 
@@ -124,7 +124,7 @@ class UsersTable extends React.Component {
     }
 
     checkIfSearchingForUsersWouldWork() {
-        searchPrincipals(this.props.accessToken, 'dummy')
+        findPrincipals(this.props.accessToken, 'dummy')
             .then(() => {
                 this.setState({addUserEnabled: true});
             })
@@ -163,7 +163,7 @@ class UsersTable extends React.Component {
         const newGroupInfo = merge(this.state.groupInfo, {});
 
         this.executeRequest(
-            deleteGroupMember(this.props.accessToken, this.state.groupInfo.id, sub)
+            removeGroupMember(this.props.accessToken, this.state.groupInfo.id, sub)
                 .then((newData) => {
                     newGroupInfo.members = newGroupInfo.members.filter((x) => x.principal !== sub);
                     this.setState({groupInfo: newGroupInfo});
@@ -201,7 +201,7 @@ class UsersTable extends React.Component {
                     }
                     return Promise.resolve();
                 })
-                .then(() => patchUserRoles(this.props.accessToken, this.state.groupInfo.id, sub, rolesChanges))
+                .then(() => modifyUserRoles(this.props.accessToken, this.state.groupInfo.id, sub, rolesChanges))
                 .then((newData) => {
                     const newMember = this.getMemberBySub(newGroupInfo.members, sub);
                     newMember.roles = newData.roles;
