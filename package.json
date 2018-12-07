@@ -8,7 +8,6 @@
     "storybook": "start-storybook -p 3000",
     "build-storybook": "build-storybook",
     "code-check": "eslint --ext .js --ext .jsx src",
-    "translate": "cimpress-translations-cli -a 8a76a642-dd82-41d0-887f-604ff91901c9 -c ${CLIENT_ID} -s ${CLIENT_SECRET} -t ./src/locales/translations.json",
     "compile": "babel src -d lib --copy-files"
   },
   "files": [
@@ -47,7 +46,6 @@
     "auth0-sso-login": "^3.0.115",
     "aws-sdk": "^2.286.2",
     "babel-loader": "^8.0.4",
-    "cimpress-translations-cli": "^0.1.4",
     "css-loader": "^1.0.0",
     "eslint": "^5.2.0",
     "eslint-config-google": "^0.9.1",

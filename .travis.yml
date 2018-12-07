@@ -7,7 +7,6 @@ install:
 - npm install
 script:
 - npm run code-check
-- npm run translate
 - npm run compile
 deploy:
   provider: npm
