@@ -1,6 +1,6 @@
 {
   "name": "react-cimpress-users",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "A simple user management component based on COAM",
   "main": "./lib/index.js",
   "scripts": {
@@ -60,8 +60,8 @@
     "webpack-dev-server": "^3.1.5"
   },
   "dependencies": {
-    "axios": "^0.18.0",
-    "coam-client": "^0.1.13",
+    "axios": "^0.18.1",
+    "coam-client": "^0.1.14",
     "debounce": "^1.1.0",
     "deepmerge": "^2.1.1",
     "i18next": "^11.5.0",
